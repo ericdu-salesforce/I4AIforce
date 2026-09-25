@@ -118,6 +118,13 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface2)} tr.sel td
 .srcgrid span{font-size:12px;color:var(--ok)}
 .srcgrid .rs span{color:var(--warn)}
 @media (max-width:760px){.srcgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.defn{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--surface2);font-size:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.steps{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.steps span{border:1px solid var(--line);border-radius:8px;padding:4px 9px;background:var(--surface2);color:var(--ink)}
+.code{margin:12px 0 0;padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);font-size:12.5px;line-height:1.5;white-space:pre-wrap;color:var(--ink)}
+.learn{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--brand-soft);display:flex;flex-direction:column;gap:4px;font-size:14px}
+.learn b{color:var(--brand-ink)}
+.under{margin:14px 10px 0;font-size:12px;color:var(--muted);line-height:1.5}
 </style>
 </head>
 <body>
@@ -126,7 +133,7 @@ tr.click{cursor:pointer} tr.click:hover td{background:var(--surface2)} tr.sel td
     <h1>Informatica for AIforce · in Claude</h1>
     <div class="actions"><button class="btn" id="restart">Restart</button><button class="btn primary" id="next">Next →</button></div>
   </header>
-  <nav class="nav" aria-label="Scenes"><div id="scenes"></div></nav>
+  <nav class="nav" aria-label="Scenes"><div id="scenes"></div><p class="under">Underneath every step: AIforce Foundation · open standards</p></nav>
   <main class="center">
     <section class="host" aria-label="Conversation in Claude">
       <div class="host-head"><b>Claude</b><span class="conn" id="conn"><i></i><span id="connText">Informatica · not connected</span></span></div>
@@ -157,17 +164,33 @@ function cConnect(){
     c.querySelector(".app-body").appendChild(g); setConn(true); });
   return c;
 }
-function cAsk(){
-  const rows=[["Acme Industrial","$2.4M"],["Northwind Logistics","$1.7M"],["Globex Retail","$1.1M"]];
+function cUnderstand(){
+  const rows=[["Account","Salesforce","48K","Email · Phone"],["KNA1 · customers","SAP S/4HANA","52K","Tax ID"],["HZ_PARTIES","Oracle EBS","31K","Address"],["DIM_CUSTOMER","Snowflake","55K","Email"]];
   const body=el("div");
-  const t=el("table"); t.innerHTML=`<thead><tr><th>Account</th><th>Open orders · SAP</th><th>Opportunities · Salesforce</th><th>Owner email</th></tr></thead>`;
-  const tb=el("tbody"); const lin=el("div",{class:"lineage"}); lin.hidden=true;
-  rows.forEach(r=>{ const tr=el("tr",{class:"click",tabindex:"0"},`<td><b>${r[0]}</b></td><td>${r[1]}</td><td>None</td><td class="masked">•••• masked</td>`);
-    const show=()=>{tb.querySelectorAll("tr").forEach(x=>x.classList.remove("sel"));tr.classList.add("sel");lin.innerHTML=`<b>Lineage</b><span>SAP · orders</span>→<span>Matched account</span>→<span>Salesforce · opportunities</span>`;lin.hidden=false;};
-    tr.addEventListener("click",show); tr.addEventListener("keydown",e=>{if(e.key==="Enter")show();}); tb.appendChild(tr); });
-  t.appendChild(tb); body.append(t,lin);
-  return card("Answer","SAP + Salesforce",body,`<span class="chip ok">PII masked</span><span class="chip">Lineage recorded</span><span class="meter">18 Flex Credits</span>`);
+  body.innerHTML=`<table><thead><tr><th>Dataset</th><th>System</th><th>Rows</th><th>Sensitive fields</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="chip warn">${r[3]}</span></td></tr>`).join("")}</tbody></table>
+   <div class="defn"><b>Active customer</b> · ordered in the last 12 months <span class="chip ok">Certified definition</span></div>`;
+  return card("Understand","Metadata lakehouse",body,`<span class="chip brand">4 systems scanned</span><span class="chip">12 PII fields classified</span><span class="chip">Lineage mapped</span>`);
 }
+function cTransform(){
+  const body=el("div");
+  body.innerHTML=`<div class="steps"><span>SAP · open orders (CDC)</span>→<span>Join to golden customer</span>→<span>Snowflake · OPEN_ORDERS</span></div>
+   <pre class="code mono">select o.order_id, c.golden_id, o.open_value
+from sap.vbak o
+join mdm.golden_customer c on c.sap_id = o.kunnr
+where o.status = 'OPEN';</pre>
+   <div class="row" style="margin-top:12px" data-slot><button class="btn primary" data-deploy>Deploy · daily at 6:00</button><span class="muted">Runs on your Snowflake</span></div>`;
+  const c=card("Agentic Data Integration","Pipeline",body,`<span class="chip ok">3 tests passed</span><span class="chip">Push-down to Snowflake</span><span class="meter">Reviewed before deploy</span>`);
+  on(c,"[data-deploy]",()=>{c.querySelector("[data-slot]").innerHTML=`<span class="ok-text">✓ Deployed · first run tomorrow 6:00</span>`;});
+  return c;
+}
+function cDeliver(){
+  const dests=[["Snowflake","Table"],["Data 360","Data stream"],["Semantic layer","Metric"],["OKF","Knowledge doc"]];
+  const body=el("div");
+  body.innerHTML=`<div class="row"><span class="chip">Owner · Sales Ops</span><span class="chip">Fresh daily by 6:00</span><span class="chip ok">Quality 98%</span></div>
+   <div class="srcgrid">${dests.map(([n,m])=>`<div><b>${n}</b><span>✓ ${m}</span></div>`).join("")}</div>`;
+  return card("Data product","Open orders by account",body,`<span class="chip brand">Contract attached</span><span class="chip">Lineage to source</span>`);
+}
+
 function cMatch(){
   const body=el("div");
   body.innerHTML=`<div class="muted" style="margin-bottom:6px">Incoming · <b style="color:var(--ink)">ACME Corp., 1 Main St, Springfield</b></div>
@@ -189,21 +212,29 @@ function cPolicy(){
   on(c,"[data-exc]",()=>{c.querySelector("[data-slot]").innerHTML=`<span class="chip warn">Sent to data steward</span>`;});
   return c;
 }
-function cAudit(){
-  const rows=[["09:02","Jordan","Claude","Connect","Allowed"],["09:07","Jordan","Claude","Read SAP + Salesforce","Allowed · masked"],["09:12","Jordan","Claude","Match and merge","Approved"],["09:15","Jordan","Claude","Read personal mobile","Blocked"],["09:20","Priya","Agentforce","Read Snowflake","Allowed"],["09:31","Marco","Copilot","Read Oracle","Allowed · masked"]];
+function cLoop(){
+  const rows=[["09:02","Jordan","Claude","Connect","Allowed"],["09:05","Jordan","Claude","Scan customer data","Allowed"],["09:09","Jordan","Claude","Deploy pipeline","Approved"],["09:12","Jordan","Claude","Publish data product","Approved"],["09:15","Jordan","Claude","Match and merge","Approved"],["09:17","Jordan","Claude","Read personal mobile","Blocked"],["09:20","Priya","Agentforce","Read data product","Allowed"],["09:31","Marco","Copilot","Read Oracle","Allowed · masked"]];
   const body=el("div"); const f=el("div",{class:"filters"});
   const t=el("table"); t.innerHTML=`<thead><tr><th>Time</th><th>Person</th><th>Agent</th><th>Action</th><th>Policy</th></tr></thead>`; const tb=el("tbody"); t.appendChild(tb);
   const render=a=>{tb.innerHTML=rows.filter(r=>a==="All"||r[2]===a).map(r=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="chip ${r[4]==="Blocked"?"bad":"ok"}">${r[4]}</span></td></tr>`).join("");};
   ["All","Claude","Agentforce","Copilot"].forEach((a,i)=>{const b=el("button",{class:"f","aria-pressed":String(i===0)},a);b.addEventListener("click",()=>{f.querySelectorAll(".f").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render(a);});f.appendChild(b);});
-  render("All"); body.append(f,t);
-  return card("Audit trail","Today",body,`<span class="chip brand">Every agent · one log</span><span class="chip">Person + agent on every call</span>`);
+  render("All");
+  const learn=el("div",{class:"learn"},`<b>Learned today · context graph</b>
+    <div>✓ ACME Corp. is Acme Corporation <span class="muted">· confirmed by Jordan</span></div>
+    <div>✕ Acme Co. Holdings is a different company <span class="muted">· rejected by Jordan</span></div>
+    <div>↑ Open orders by account used by 3 agents <span class="muted">· usage signal</span></div>`);
+  body.append(f,t,learn);
+  return card("Close the loop","Today",body,`<span class="chip brand">One audit trail</span><span class="chip">↺ Feeds the Metadata lakehouse</span>`);
 }
+
 const SCENES=[
  {t:"Connect",p:"One sign-in",prompt:"Connect Informatica.",reply:"Sign in once, and I can reach your enterprise sources. I never see their credentials.",tools:["connect"],card:cConnect},
- {t:"Ask",p:"Connectivity",prompt:"Which accounts have over $1M in open SAP orders but no Salesforce opportunity?",reply:"Three accounts. Select one to see where the answer came from.",tools:["read · SAP","read · Salesforce"],card:cAsk},
- {t:"Match",p:"Matching",prompt:"A new lead came in: ACME Corp., 1 Main St, Springfield. Do we already know them?",reply:"Yes — it's likely an existing customer. Review the matches:",tools:["match"],card:cMatch},
- {t:"Protect",p:"One policy set",prompt:"Get me the account owner's personal mobile number.",reply:"I can't — your organization's policy blocks it. Here are your options:",tools:["read · Salesforce"],card:cPolicy},
- {t:"Audit",p:"One audit trail",prompt:"What did we do with our data today?",reply:"Everything, across every agent:",tools:["audit_log"],card:cAudit}
+ {t:"Understand",p:"Metadata lakehouse",prompt:"Where does our customer data live, and what's sensitive?",reply:"Customer data lives in four systems. Here's what Informatica knows about it:",tools:["scan","metadata_lakehouse"],card:cUnderstand},
+ {t:"Transform",p:"Agentic Data Integration",prompt:"Build a daily pipeline that brings open SAP orders into Snowflake, joined to our customers.",reply:"Here's the pipeline. It runs on your Snowflake, and the tests pass.",tools:["plan_pipeline","generate · dbt"],card:cTransform},
+ {t:"Deliver",p:"Data product",prompt:"Publish it as a data product for the sales agents.",reply:"Published with a contract, everywhere the agents need it:",tools:["publish"],card:cDeliver},
+ {t:"Trust · match",p:"Matching",prompt:"A new lead came in: ACME Corp., 1 Main St, Springfield. Do we already know them?",reply:"Yes — it's likely an existing customer. Review the matches:",tools:["match"],card:cMatch},
+ {t:"Trust · protect",p:"One policy set",prompt:"Get me the account owner's personal mobile number.",reply:"I can't — your organization's policy blocks it. Here are your options:",tools:["read · Salesforce"],card:cPolicy},
+ {t:"Close the loop",p:"Audit and learn",prompt:"What did we do today, and what did Informatica learn?",reply:"Everything is in one audit trail — and your decisions now improve the context for every agent:",tools:["audit_log","context_graph"],card:cLoop}
 ];
 let cur=-1, tok=0;
 const nav=$("#scenes");

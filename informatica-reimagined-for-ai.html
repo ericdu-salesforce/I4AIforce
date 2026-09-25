@@ -204,6 +204,8 @@ footer{margin-top:48px;color:var(--muted);font-size:13px;border-top:1px solid va
 .comp.coreband .t{font-size:16px;color:var(--blue)}
 .comp.coreband .d{margin-top:0;font-size:14px;color:var(--ink2)}
 .comp.coreband .h{margin:0 0 0 auto}
+.band.loopband{margin-top:12px;background:var(--paper);border:1px solid var(--line)}
+.band.loopband .loop{margin-left:auto;font-size:13px;color:var(--ink2)}
 </style>
 <script>/* d3 v7.9.0 · ISC license · https://d3js.org */
 // https://d3js.org v7.9.0 Copyright 2010-2023 Mike Bostock
@@ -218,7 +220,7 @@ footer{margin-top:48px;color:var(--muted);font-size:13px;border-top:1px solid va
   <div>
     <p class="kicker mono">Informatica for AIforce · the platform we are building toward</p>
     <h1>Informatica reimagined for AI</h1>
-    <p class="lede">Connect every source, understand it, make it trustworthy, transform it with agents, and deliver it as the context every platform and agent depends on.</p>
+    <p class="lede">Connect every source, understand it, transform it with agents, deliver it where it is needed, keep it trustworthy, and close the loop so the context gets better with every call.</p>
   </div>
   <aside><p style="margin:0"><b>Start small, keep the whole picture.</b> Now: Connectivity, Matching and the AIforce Foundation. Everything else follows, built to one standard.</p></aside>
 </header>
@@ -248,6 +250,8 @@ footer{margin-top:48px;color:var(--muted);font-size:13px;border-top:1px solid va
       <div class="flowdown mono">↑ served through one MCP server · plugins · skills · tools &amp; apps · evals ↑</div>
 
       <div class="stages" id="stages"></div>
+
+      <div class="band loopband" id="loopband"></div>
 
       <div class="band core" id="coreband"></div>
 
@@ -329,9 +333,10 @@ const H={now:{label:"Now",c:"var(--now)"},next:{label:"Next",c:"var(--next)"},la
 const STAGES=[
  {id:"connect",name:"Connect",note:"reach every source"},
  {id:"understand",name:"Understand",note:"know what exists"},
- {id:"trust",name:"Trust",note:"make it right"},
  {id:"transform",name:"Transform",note:"shape it with agents"},
- {id:"deliver",name:"Deliver",note:"where it lands"}
+ {id:"deliver",name:"Deliver",note:"where it lands"},
+ {id:"trust",name:"Trust",note:"make it right"},
+ {id:"loop",name:"Close the loop",note:"context that compounds",band:true}
 ];
 const C=[
  {id:"conn",stage:"connect",h:"now",t:"Connectivity as a Service",d:"One governed connection, 300+ sources",
@@ -398,18 +403,26 @@ const C=[
   what:"Curated knowledge — definitions, runbooks, policies, dataset docs — published as Open Knowledge Format bundles: markdown files with frontmatter, cross-linked.",
   why:"It lets Informatica's context travel to any agent, with no SDK — the most portable form context can take.",
   signal:"Google Cloud introduced OKF in June 2026, with v0.2 adding trust and provenance signals in July."},
- {id:"cg",stage:"deliver",h:"next",t:"Context graph",d:"Decision traces, fed back",
+ {id:"cg",stage:"loop",h:"next",t:"Context graph",d:"Decision traces from every agent",
   what:"Capture the decisions agents make with Informatica services — which match was accepted, which policy exception applied — and feed them back into the metadata lakehouse.",
   why:"It closes the loop: the more agents use the platform, the better the context gets. That compounding is the moat.",
-  signal:"Foundation Capital's context-graph thesis argues decision traces become the new system of record for the agent era."}
+  signal:"Foundation Capital's context-graph thesis argues decision traces become the new system of record for the agent era."},
+ {id:"usage",stage:"loop",h:"next",t:"Usage signals",d:"What agents actually use",
+  what:"Telemetry from every MCP call — which sources, data products and definitions agents rely on — flows back into the metadata lakehouse as popularity, trust scores and quality priorities.",
+  why:"Real usage shows which context matters and what to fix first, so the platform improves where it counts.",
+  signal:"Evaluation and observability loops are becoming standard in agent platforms; usage-driven context ranking is the data-management equivalent."}
 ];
 const stagesEl=document.getElementById("stages"), panel=document.getElementById("panel");
-STAGES.forEach(s=>{
+STAGES.filter(x=>!x.band).forEach(s=>{
   const col=document.createElement("div"); col.className="stage";
   col.innerHTML=`<header><b>${s.name}</b></header>`;
   C.filter(c=>c.stage===s.id && !c.core).forEach(c=>col.appendChild(tile(c)));
   stagesEl.appendChild(col);
 });
+const loopBand=document.getElementById("loopband");
+loopBand.innerHTML=`<h3>Close the loop<small>context that compounds</small></h3>`;
+C.filter(c=>c.stage==="loop").forEach(c=>{const t=tile(c); t.style.flex="1 1 220px"; loopBand.appendChild(t);});
+const ln=document.createElement("span"); ln.className="loop mono"; ln.textContent="↺ feeds the Metadata lakehouse"; loopBand.appendChild(ln);
 const core=C.find(c=>c.core);
 const ct=tile(core); ct.classList.add("coreband");
 ct.querySelector(".d").textContent="The context core: open and SQL-queryable · every service reads and writes here · decision traces flow back ↺";
@@ -477,14 +490,6 @@ const DATA={name:"Informatica for AIforce",sub:"the AI-ready data platform",
    {name:"Enterprise context",sub:"definitions, semantics, relationships",h:"next",what:"Business definitions, semantics and relationships between entities, served to agents alongside the data.",why:"Agents need meaning, not just rows. Shared definitions keep every agent consistent."},
    {name:"Lineage",sub:"end to end",h:"next",what:"Column-level lineage from source record through every transformation to every destination, including vectors and ontologies.",why:"Agents and auditors both need to trace where an answer came from."}
   ]},
- {name:"Trust",sub:"make it right",
-  what:"Quality, identity and policy — applied to every record and every call.",
-  why:"Agents fail silently on bad or unresolved data, and enterprises will not give agents access without governance.",
-  children:[
-   {name:"Matching as a Service",sub:"golden records, scored and explained",h:"now",what:"Matching as a Service resolves customers, products and suppliers into golden records, with scores and reasons, backed by MDM.",why:"Ontologies need entities that are actually the same thing. Resolved entities are Informatica's most valuable input to them."},
-   {name:"Data quality",sub:"rules from metadata",h:"next",what:"Rules generated from profiles and definitions, enforced inside pipelines and callable by agents before they act.",why:"Quality has to travel with the data into every destination."},
-   {name:"Policy & masking",sub:"governance on every call",h:"next",what:"Classification-driven access and masking, the same for people and agents, at source and at delivery.",why:"Trust is what makes agent access possible at all."}
-  ]},
  {name:"Transform",sub:"shape it with agents",
   what:"Pipelines and transformation, reinvented: agentic and pro-code, one flow for structured and unstructured data.",
   why:"This is where Data Integration and Transformation are being disrupted — and where Informatica must reinvent to stay relevant.",
@@ -507,6 +512,14 @@ const DATA={name:"Informatica for AIforce",sub:"the AI-ready data platform",
    {name:"Vectors",sub:"with lineage & permissions",h:"next",u:true,what:"Embeddings delivered with the permissions, classification and lineage of their source.",why:"Most vector pipelines lose governance at the embedding step. Keeping it is a differentiator."},
    {name:"OKF knowledge bundles",sub:"curated knowledge, any agent",h:"next",u:true,what:"Definitions, runbooks, policies and dataset docs as Open Knowledge Format bundles — markdown with frontmatter, cross-linked.",why:"The most portable form context can take: no SDK, readable by any agent.",signal:"Google Cloud introduced OKF in June 2026; v0.2 added trust and provenance signals in July."},
    {name:"Lakehouse tables",sub:"Iceberg and Delta",h:"next",what:"Curated, governed tables in whichever lakehouse the customer runs.",why:"Meet customers on the platforms they already chose."}
+  ]},
+ {name:"Trust",sub:"make it right",
+  what:"Quality, identity and policy — applied to every record and every call.",
+  why:"Agents fail silently on bad or unresolved data, and enterprises will not give agents access without governance.",
+  children:[
+   {name:"Matching as a Service",sub:"golden records, scored and explained",h:"now",what:"Matching as a Service resolves customers, products and suppliers into golden records, with scores and reasons, backed by MDM.",why:"Ontologies need entities that are actually the same thing. Resolved entities are Informatica's most valuable input to them."},
+   {name:"Data quality",sub:"rules from metadata",h:"next",what:"Rules generated from profiles and definitions, enforced inside pipelines and callable by agents before they act.",why:"Quality has to travel with the data into every destination."},
+   {name:"Policy & masking",sub:"governance on every call",h:"next",what:"Classification-driven access and masking, the same for people and agents, at source and at delivery.",why:"Trust is what makes agent access possible at all."}
   ]},
  {name:"Close the loop",sub:"context that compounds",
   what:"Capture what agents decide with Informatica services and feed it back into the metadata lakehouse.",
