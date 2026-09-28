@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Informatica for AIforce · Drive up consumption roadmap</title>
+<style>
+:root{
+  --page:#f4f6f9; --surface:#ffffff; --surface2:#f7f9fb; --ink:#14202e; --ink2:#3e4a5c; --muted:#66768a; --line:#dde3ea;
+  --navy:#032d60; --blue:#0176d3; --cloud:#00a1e0; --tint:#eaf5fe;
+  --now:#1f7a3f; --now-soft:#e6f4eb; --r1:#0176d3; --r1-soft:#e3f0fc; --r2:#5a4fcf; --r2-soft:#ecebfb; --r3:#9a5b00; --r3-soft:#fdf1dc;
+  --shadow:0 1px 2px rgba(20,32,46,.05),0 8px 26px rgba(20,32,46,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0f141a; --surface:#171d25; --surface2:#1d2530; --ink:#e9edf2; --ink2:#c3ccd6; --muted:#8f9bab; --line:#2a3440;
+    --navy:#d9e8f8; --blue:#5aa8f0; --cloud:#5ec8f0; --tint:#16304c;
+    --now:#62c98a; --now-soft:#14301f; --r1:#5aa8f0; --r1-soft:#16304c; --r2:#a79ff0; --r2-soft:#26234a; --r3:#f0b25c; --r3-soft:#3a2a12;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0f141a; --surface:#171d25; --surface2:#1d2530; --ink:#e9edf2; --ink2:#c3ccd6; --muted:#8f9bab; --line:#2a3440;
+  --navy:#d9e8f8; --blue:#5aa8f0; --cloud:#5ec8f0; --tint:#16304c;
+  --now:#62c98a; --now-soft:#14301f; --r1:#5aa8f0; --r1-soft:#16304c; --r2:#a79ff0; --r2-soft:#26234a; --r3:#f0b25c; --r3-soft:#3a2a12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.3);
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:1280px;margin:0 auto;padding:36px 24px 72px}
+.kicker{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(30px,4.4vw,50px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px;color:var(--navy);max-width:22ch}
+.lede{font-size:18px;color:var(--ink2);max-width:70ch;margin:0}
+section{padding-top:44px}
+h2{font-size:24px;margin:0 0 6px;color:var(--navy)}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+/* then vs now */
+.shift{display:grid;grid-template-columns:1fr 64px 1fr;gap:0;align-items:stretch}
+.shift .card{padding:22px 24px}
+.shift h3{margin:0 0 12px;font-size:18px}
+.shift ul{margin:0;padding-left:18px;color:var(--ink2)}
+.shift li{margin:6px 0}
+.shift .to{background:#032d60;color:#fff;border-color:transparent}
+.shift .to h3{color:#fff} .shift .to ul{color:#d6e2ef}
+.arrow{display:grid;place-items:center;font-size:30px;color:var(--blue)}
+.big{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}
+.big div{min-width:120px}
+.big b{display:block;font-size:34px;line-height:1;letter-spacing:-.02em}
+.big span{font-size:13px;color:var(--muted)}
+.to .big span{color:#b9cde4}
+/* releases */
+.releases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.rel{padding:20px 22px;border-top:6px solid var(--c)}
+.rel .when{font-size:13px;color:var(--muted);margin:0}
+.rel h3{margin:2px 0 4px;font-size:22px;color:var(--navy)}
+.rel .theme{font-weight:700;color:var(--c);margin:0 0 12px}
+.rel .cov{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.bar{flex:1;height:10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c)}
+.rel .cov span{font-size:13px;font-weight:700;color:var(--ink2);white-space:nowrap}
+.rel h4{margin:14px 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rel ul{margin:0;padding-left:18px;color:var(--ink2);font-size:14.5px}
+.rel li{margin:4px 0}
+/* tool map */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.toolbar .l{font-size:13px;color:var(--muted);margin-right:4px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink2);border-radius:999px;padding:5px 12px;font:600 13px system-ui,sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.stage{padding:14px;background:var(--surface)}
+.stage h3{margin:0 0 2px;font-size:17px;color:var(--navy)}
+.stage .ns{font-size:12px;color:var(--muted);margin:0 0 10px}
+.tool{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:7px 8px;border-radius:8px;border:1px solid var(--line);margin-bottom:6px;font-size:13.5px;background:var(--surface);transition:opacity .2s}
+.tool.dim{opacity:.18}
+.tag{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;white-space:nowrap}
+.t-now{background:var(--now-soft);color:var(--now)} .t-r1{background:var(--r1-soft);color:var(--r1)} .t-r2{background:var(--r2-soft);color:var(--r2)} .t-r3{background:var(--r3-soft);color:var(--r3)}
+.app{font-size:11px;font-weight:700;color:var(--blue);border:1px solid var(--blue);border-radius:6px;padding:0 5px;margin-left:4px}
+.tags{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;align-items:center;flex-shrink:0;max-width:52%}
+.tool>span:first-child{min-width:0}
+.under{margin-top:10px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.under b{margin-right:6px;color:var(--navy)}
+.under .tool{margin:0}
+/* principles */
+.principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pr{padding:16px 18px}
+.pr b{display:block;color:var(--navy);margin-bottom:4px}
+.pr span{color:var(--ink2);font-size:14.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.two .card{padding:18px 22px}
+.two h3{margin:0 0 8px;font-size:17px;color:var(--navy)}
+.two ul{margin:0;padding-left:18px;color:var(--ink2);font-size:14.5px}
+.two li{margin:5px 0}
+footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (max-width:1100px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}.principles{grid-template-columns:1fr 1fr}}
+@media (max-width:820px){
+  .shift{grid-template-columns:1fr}.arrow{transform:rotate(90deg);padding:6px 0}
+  .releases,.principles,.two,.map{grid-template-columns:1fr}
+}
+.verbs{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.verbs .card{padding:20px 22px}
+.verbs h3{margin:0 0 10px;font-size:17px;color:var(--navy)}
+.vlist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.v{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface2)}
+.v b{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--blue);font-size:14px}
+.v span{font-size:13.5px;color:var(--ink2)}
+.stg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.stg span{border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;background:var(--tint);color:var(--blue)}
+.note{font-size:14px;color:var(--ink2);margin:10px 0 0}
+.apps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.apps .col{padding:14px}
+.apps h3{margin:0 0 10px;font-size:16px;color:var(--navy)}
+.ap{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:13.5px;display:flex;justify-content:space-between;gap:6px;align-items:flex-start}
+.ap small{display:block;color:var(--muted);font-size:12px}
+@media (max-width:1100px){.apps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.verbs,.vlist,.apps{grid-template-columns:1fr}}
+.appname{display:block;font-size:11.5px;color:var(--blue);margin-top:2px}
+.stage h3{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.vlist.five{display:flex;align-items:stretch;gap:8px}
+.vlist.five .v{flex:1}
+.flowarrow{align-self:center;color:var(--blue);font-size:20px}
+@media (max-width:820px){.vlist.five{flex-direction:column}.flowarrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Informatica for AIforce · Drive up consumption</p>
+  <h1>Roadmap: one plugin, one MCP server</h1>
+  <p class="lede">From 55 text-only MCP servers to one plugin and one server, organized by the flow of work, with MCP Apps where people decide.</p>
+
+  <section>
+    <div class="shift">
+      <div class="card">
+        <h3>Today · September 2026</h3>
+        <div class="big"><div><b>55</b><span>MCP servers</span></div><div><b>2</b><span>Claude plugins</span></div><div><b>30–40%</b><span>capabilities headless</span></div></div>
+        <ul><li>Organized by product, not by task</li><li>Text in, text out</li></ul>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="card to">
+        <h3>Target · April 2027</h3>
+        <div class="big"><div><b>1</b><span>MCP server, 5 toolsets</span></div><div><b>1</b><span>plugin</span></div><div><b>~20</b><span>MCP Apps</span></div></div>
+        <ul><li>Organized by the flow of work: connect → understand → transform → deliver → trust</li><li>Rich experiences where people see, review and decide</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>One server, five toolsets</h2>
+    <p class="sub">One toolset for each step in the flow of work. Skills load one toolset at a time.</p>
+    <div class="vlist five">
+      <div class="v"><b>connect</b><span>Sources, agents, runtimes</span></div>
+      <span class="flowarrow" aria-hidden="true">→</span>
+      <div class="v"><b>understand</b><span>Search, profile, enrich, trace</span></div>
+      <span class="flowarrow" aria-hidden="true">→</span>
+      <div class="v"><b>transform</b><span>Build, run, fix pipelines</span></div>
+      <span class="flowarrow" aria-hidden="true">→</span>
+      <div class="v"><b>deliver</b><span>Lakehouses, vectors, data products</span></div>
+      <span class="flowarrow" aria-hidden="true">→</span>
+      <div class="v"><b>trust</b><span>Quality, mastering, policy, audit</span></div>
+    </div>
+    <p class="note">Every tool has its own schema, is marked read-only or write, and can carry its own MCP App.</p>
+  </section>
+
+  <section>
+    <h2>Three releases</h2>
+    <p class="sub">Aligned to the IDMC release train. Release 1 is light while the team forms.</p>
+    <div class="releases">
+      <article class="card rel" style="--c:var(--r1)">
+        <p class="when">October 2026</p>
+        <h3>Release 1</h3>
+        <p class="theme">Set the foundation</p>
+        <div class="cov"><div class="bar"><i style="width:40%"></i></div><span>~40% headless</span></div>
+        <ul><li>Team in place; owner for each toolset</li><li>Tool standard v1 and eval baseline</li><li>Lineage</li><li>First MCP App: DQ scorecard</li></ul>
+      </article>
+      <article class="card rel" style="--c:var(--r2)">
+        <p class="when">February 2027</p>
+        <h3>Release 2</h3>
+        <p class="theme">Consolidate and expand</p>
+        <div class="cov"><div class="bar"><i style="width:65%"></i></div><span>~65% headless</span></div>
+        <ul><li>One server and one plugin in preview, in Claude</li><li>Mapping, taskflow, ingestion into lakehouses</li><li>DQ authoring, stewardship, access policies</li><li>12 MCP Apps</li><li>Metering in Flex Credits</li></ul>
+      </article>
+      <article class="card rel" style="--c:var(--r3)">
+        <p class="when">April 2027</p>
+        <h3>Release 3</h3>
+        <p class="theme">Complete</p>
+        <div class="cov"><div class="bar"><i style="width:85%"></i></div><span>~85% headless</span></div>
+        <ul><li>One server and plugin GA, also in ChatGPT</li><li>Data products, contracts, vectors</li><li>Hierarchy, survivorship, reference data</li><li>8 more MCP Apps</li><li>Sunset plan for the 55 servers</li></ul>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every tool and MCP App, by step</h2>
+    <p class="sub">What's available today and what each release adds.</p>
+    <div class="toolbar" role="group" aria-label="Filter">
+      <span class="l">Show</span>
+      <button class="chip" data-f="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="now" aria-pressed="false">Today</button>
+      <button class="chip" data-f="r1" aria-pressed="false">Release 1</button>
+      <button class="chip" data-f="r2" aria-pressed="false">Release 2</button>
+      <button class="chip" data-f="r3" aria-pressed="false">Release 3</button>
+      <button class="chip" data-f="app" aria-pressed="false">MCP Apps</button>
+    </div>
+    <div class="map" id="map"></div>
+    <div class="card under" id="under"></div>
+  </section>
+
+  <section>
+    <div class="two">
+      <div class="card">
+        <h3>Principles</h3>
+        <ul><li>One toolset per step in the flow, one standard</li><li>Read-only by default; writes need approval</li><li>Apps where people decide</li><li>Every tool passes evals before it ships</li></ul>
+      </div>
+      <div class="card">
+        <h3>Dependencies</h3>
+        <ul><li>Team setup completed in Release 1</li><li>Committed capacity from domain teams</li><li>IPU-to-Flex-Credit conversion before Release 2</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>Illustrative plan. Dates follow the IDMC release train and may shift.</footer>
+</div>
+<script>
+const STAGES=[
+ {id:"connect",name:"connect",ns:"sources, agents, runtimes",tools:[["Connection management","now","r2","Connection health"],["Secure agent management","now"],["Runtime setup","r3","r3","Runtime status"]]},
+ {id:"understand",name:"understand",ns:"search, profile, enrich, trace",tools:[["Catalog discovery","now","r2","Catalog search"],["Catalog metadata search","now","r2","Asset profile"],["Catalog enrichment","now","r3","Enrichment review"],["Catalog asset history","now"],["Lineage","r1","r2","Lineage graph"],["Business entity service","r3"]]},
+ {id:"transform",name:"transform",ns:"build, run, fix pipelines",tools:[["Job management","now","r2","Job monitor"],["Troubleshooting","now","r2","Root cause, fix and rerun"],["Log management","now"],["Asset promotion","now","r3","Dev-to-prod review"],["Mapping authoring","r2","r3","Mapping review"],["Taskflow management","r2"]]},
+ {id:"deliver",name:"deliver",ns:"lakehouses, vectors, data products",tools:[["Ingestion and replication into lakehouses","r2","r2","Ingestion review"],["Unstructured data into vectors","r3","r3","Vector preview"],["Data product authoring","r3","r3","Data product builder"],["Contract and SLA authoring","r3"],["Data provisioning","now","r2","Access request"]]},
+ {id:"trust",name:"trust",ns:"quality, mastering, policy, audit",tools:[["Data quality score","now","r1","DQ scorecard"],["DQ authoring","r2","r2","Rule builder"],["Scorecard authoring","r2"],["Customer identification","now","r2","Match and merge"],["Address verification","now"],["Stewardship management","r2","r2","Stewardship inbox"],["Job management (MDM)","r2"],["Hierarchy management","r3","r3","Hierarchy explorer"],["Survivorship configuration","r3"],["Reference data management","r3"],["Access policy management","r2","r2","Policy decision"],["Audit management","now","r3","Audit explorer"]]}
+];
+const UNDER=[["User management","now"],["IPU and Flex Credit usage","now"],["Industry vertical packs","r3"]];
+const LABEL={now:"Today",r1:"R1",r2:"R2",r3:"R3"};
+function toolEl(t){
+  const [name,rel,app]=t;
+  const d=document.createElement("div"); d.className="tool"; d.dataset.rel=rel; d.dataset.app=app?"1":"";
+  const appName=t[3];
+  d.innerHTML=`<span>${name}${appName?`<small class="appname">App: ${appName} · ${LABEL[app]}</small>`:""}</span><span class="tags"><span class="tag t-${rel}">${LABEL[rel]}</span>${app?`<span class="app" title="MCP App in ${LABEL[app]}">App</span>`:""}</span>`;
+  return d;
+}
+const map=document.getElementById("map");
+STAGES.forEach(s=>{
+  const c=document.createElement("div"); c.className="card stage";
+  c.innerHTML=`<h3>${s.name}</h3><p class="ns mono">${s.tools.length} tools</p>`;
+  s.tools.forEach(t=>c.appendChild(toolEl(t))); map.appendChild(c);
+});
+const under=document.getElementById("under");
+under.innerHTML=`<b>Underneath · admin</b>`; UNDER.forEach(t=>under.appendChild(toolEl(t)));
+document.querySelectorAll(".chip[data-f]").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  const f=b.dataset.f;
+  document.querySelectorAll(".tool").forEach(t=>{
+    const show = f==="all" || (f==="app" ? !!t.dataset.app : t.dataset.rel===f);
+    t.classList.toggle("dim",!show);
+  });
+}));
+</script>
+</body>
+</html>
