@@ -124,6 +124,63 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:v
 .vlist.five .v{flex:1}
 .flowarrow{align-self:center;color:var(--blue);font-size:20px}
 @media (max-width:820px){.vlist.five{flex-direction:column}.flowarrow{transform:rotate(90deg)}}
+
+/* ---- MCP App viewer ---- */
+.appbtn{all:unset;cursor:pointer;display:block;font-size:11.5px;color:var(--blue);margin-top:2px;text-decoration:underline;text-underline-offset:2px}
+.appbtn:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:3px}
+.browse{margin-left:auto}
+dialog.viewer{border:0;padding:0;border-radius:18px;max-width:880px;width:calc(100% - 32px);background:var(--page);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog.viewer::backdrop{background:rgba(10,20,35,.55)}
+.vhead{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 10px}
+.vhead h3{margin:0;font-size:20px;color:var(--navy)}
+.vhead p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.vhead .x{margin-left:auto}
+.vbody{padding:6px 20px 16px}
+.vnav{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid var(--line);background:var(--surface)}
+.vnav .count{margin:0 auto;font-size:13px;color:var(--muted)}
+.btn2{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font:600 13px system-ui,sans-serif;color:var(--ink)}
+.btn2:hover{border-color:var(--ink2)}
+.btn2.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn2:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* app card (as rendered inside the agent) */
+.mapp{border:1px solid #bcd8f3;border-radius:14px;overflow:hidden;background:var(--surface)}
+.mapp-h{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#e8f2fc;color:#0a3f73;font-weight:600;font-size:14px}
+.mapp-h .lg{width:20px;height:20px;border-radius:6px;background:#0b6bcb;color:#fff;display:grid;place-items:center;font-size:11px}
+.mapp-h .r{margin-left:auto;font-weight:500;font-size:12.5px}
+.mapp-b{padding:14px;font-size:14px}
+.mapp-f{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:var(--surface2)}
+.c{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);white-space:nowrap}
+.c.ok{background:#e6f4eb;color:#1f7a3f;border-color:transparent}
+.c.warn{background:#fdf1dc;color:#9a5b00;border-color:transparent}
+.c.bad{background:#fdeceb;color:#b42318;border-color:transparent}
+.c.br{background:#e8f2fc;color:#0a3f73;border-color:transparent}
+.mt{width:100%;border-collapse:collapse;font-size:13.5px}
+.mt th{text-align:left;font-size:11.5px;color:var(--muted);font-weight:600;padding:5px 7px;border-bottom:1px solid var(--line)}
+.mt td{padding:7px;border-bottom:1px solid var(--line);vertical-align:middle}
+.mrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mbtn{display:inline-block;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;background:#0b6bcb;color:#fff}
+.mbtn.sec{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.mbox{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface2)}
+.mg{display:grid;gap:8px}
+.m2{grid-template-columns:1fr 1fr}.m3{grid-template-columns:repeat(3,1fr)}.m4{grid-template-columns:repeat(4,1fr)}
+.tilem{border:1px solid var(--line);border-radius:10px;padding:10px}
+.tilem b{display:block;font-size:13.5px}
+.tilem span{font-size:12px;color:var(--muted)}
+.big2{font-size:24px;font-weight:700;line-height:1.1}
+.bar2{height:8px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.bar2 i{display:block;height:100%;background:#0b6bcb}
+.mono2{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+.del{background:#fdeceb;color:#8a1c12}.add{background:#e6f4eb;color:#155d30}
+.code2{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre;padding:8px 10px;border-radius:8px;border:1px solid var(--line);overflow-x:auto}
+.tree{font-size:13.5px;line-height:1.9}
+.tree .n{padding-left:18px;border-left:1px dashed var(--line);margin-left:6px}
+.ev{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.ev .t{width:48px;color:var(--muted)}
+.chunk{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px}
+.chunk .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.lg-svg text{font:12px system-ui,sans-serif;fill:var(--ink)}
+@media (max-width:640px){.m2,.m3,.m4{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -195,7 +252,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:v
 
   <section>
     <h2>Every tool and MCP App, by step</h2>
-    <p class="sub">What's available today and what each release adds.</p>
+    <p class="sub">What's available today and what each release adds. Select any app to see it.</p>
     <div class="toolbar" role="group" aria-label="Filter">
       <span class="l">Show</span>
       <button class="chip" data-f="all" aria-pressed="true">All</button>
@@ -204,6 +261,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:v
       <button class="chip" data-f="r2" aria-pressed="false">Release 2</button>
       <button class="chip" data-f="r3" aria-pressed="false">Release 3</button>
       <button class="chip" data-f="app" aria-pressed="false">MCP Apps</button>
+      <button class="chip browse" id="browseApps">View all 21 MCP Apps →</button>
     </div>
     <div class="map" id="map"></div>
     <div class="card under" id="under"></div>
@@ -224,6 +282,12 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:v
 
   <footer>Illustrative plan. Dates follow the IDMC release train and may shift.</footer>
 </div>
+
+<dialog class="viewer" id="viewer" aria-labelledby="vtitle">
+  <div class="vhead"><div><h3 id="vtitle"></h3><p id="vsub"></p></div><button class="btn2 x" id="vclose" aria-label="Close">✕</button></div>
+  <div class="vbody" id="vbody"></div>
+  <div class="vnav"><button class="btn2" id="vprev">← Previous</button><span class="count" id="vcount"></span><button class="btn2 pri" id="vnext">Next →</button></div>
+</dialog>
 <script>
 const STAGES=[
  {id:"connect",name:"connect",ns:"sources, agents, runtimes",tools:[["Connection management","now","r2","Connection health"],["Secure agent management","now"],["Runtime setup","r3","r3","Runtime status"]]},
@@ -238,7 +302,7 @@ function toolEl(t){
   const [name,rel,app]=t;
   const d=document.createElement("div"); d.className="tool"; d.dataset.rel=rel; d.dataset.app=app?"1":"";
   const appName=t[3];
-  d.innerHTML=`<span>${name}${appName?`<small class="appname">App: ${appName} · ${LABEL[app]}</small>`:""}</span><span class="tags"><span class="tag t-${rel}">${LABEL[rel]}</span>${app?`<span class="app" title="MCP App in ${LABEL[app]}">App</span>`:""}</span>`;
+  d.innerHTML=`<span>${name}${appName?`<button class="appbtn" data-app="${appName}">App: ${appName} · ${LABEL[app]}</button>`:""}</span><span class="tags"><span class="tag t-${rel}">${LABEL[rel]}</span>${app?`<span class="app" title="MCP App in ${LABEL[app]}">App</span>`:""}</span>`;
   return d;
 }
 const map=document.getElementById("map");
@@ -257,6 +321,138 @@ document.querySelectorAll(".chip[data-f]").forEach(b=>b.addEventListener("click"
     t.classList.toggle("dim",!show);
   });
 }));
+
+/* ---------------- MCP App visuals ---------------- */
+const shell=(title,right,body,foot)=>`<div class="mapp"><div class="mapp-h"><span class="lg">i</span>Informatica · ${title}${right?`<span class="r">${right}</span>`:""}</div><div class="mapp-b">${body}</div>${foot?`<div class="mapp-f">${foot}</div>`:""}</div>`;
+const c=(t,k="")=>`<span class="c ${k}">${t}</span>`;
+const tbl=(h,rows)=>`<table class="mt"><thead><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+const btn=(t,sec)=>`<span class="mbtn${sec?" sec":""}">${t}</span>`;
+const bar=p=>`<div class="bar2"><i style="width:${p}%"></i></div>`;
+
+const APPV={
+ "Connection health":{stage:"connect",what:"Test every connection, see what's broken, and fix it in place.",html:()=>shell("Connection health","4 tested",
+   tbl(["Source","Mode","Latency","Status"],[["<b>SAP S/4HANA</b>","CDC","120 ms",c("Healthy","ok")],["<b>Salesforce</b>","Real time","85 ms",c("Healthy","ok")],["<b>Snowflake</b>","Batch","210 ms",c("Healthy","ok")],["<b>Oracle EBS</b>","Batch","—",c("Secure agent offline","bad")]])
+   +`<div class="mrow" style="margin-top:12px">${btn("Restart Oracle secure agent")}${btn("Test again",1)}</div>`,
+   c("Credentials held by Informatica","br")+c("Read-only test"))},
+ "Runtime status":{stage:"connect",what:"All secure agents and runtimes at a glance, with capacity and health.",html:()=>shell("Runtime status","6 runtimes",
+   `<div class="mg m3">${[["us-east-agent-01","Healthy","ok",62],["us-east-agent-02","Healthy","ok",48],["eu-west-agent-01","High load","warn",91],["apac-agent-01","Healthy","ok",35],["serverless-us","Healthy","ok",20],["onprem-dc-02","Offline","bad",0]].map(([n,s,k,p])=>`<div class="tilem"><b class="mono2">${n}</b><div style="margin:6px 0">${c(s,k)}</div>${bar(p)}<span>${p}% capacity</span></div>`).join("")}</div>`,
+   c("1 needs attention","warn")+c("Auto-scale available"))},
+ "Catalog search":{stage:"understand",what:"Search results with certification, quality and ownership, ready to explore.",html:()=>shell("Catalog search","“customer” · 3 results",
+   [["DIM_CUSTOMER","Snowflake · table","Certified","96","Sales Ops"],["Account","Salesforce · object","Certified","93","CRM team"],["KNA1 · customers","SAP S/4HANA · table","Certified","91","Finance IT"]].map(([n,t,cert,q,o])=>`<div class="mbox" style="margin-bottom:8px;display:flex;align-items:center;gap:12px"><div style="flex:1"><b>${n}</b> ${c(cert,"ok")}<div style="color:var(--muted);font-size:12.5px">${t} · owner ${o}</div></div><div style="text-align:right"><div class="big2">${q}</div><span style="font-size:12px;color:var(--muted)">quality</span></div></div>`).join(""),
+   c("Governed results","br")+c("Filtered to your access"))},
+ "Asset profile":{stage:"understand",what:"Everything about one asset: schema, owner, glossary terms and quality.",html:()=>shell("Asset profile","DIM_CUSTOMER",
+   `<div class="mg m3" style="margin-bottom:10px"><div class="tilem"><span>Owner</span><b>Sales Ops</b></div><div class="tilem"><span>Rows</span><b>55,120</b></div><div class="tilem"><span>Quality</span><b>96 / 100</b></div></div>`
+   +tbl(["Column","Type","Glossary term","Class"],[["<span class='mono2'>customer_id</span>","string","Customer ID",c("Key","br")],["<span class='mono2'>email</span>","string","Contact email",c("PII","warn")],["<span class='mono2'>segment</span>","string","Customer segment",""],["<span class='mono2'>golden_id</span>","string","Golden record ID",c("MDM","br")]]),
+   c("Certified","ok")+c("Updated 2h ago"))},
+ "Enrichment review":{stage:"understand",what:"Review suggested classifications and glossary terms before they're applied.",html:()=>shell("Enrichment review","5 suggestions",
+   tbl(["Column","Suggestion","Confidence",""],[["<span class='mono2'>phone_mobile</span>","Class: PII · Phone","98%",btn("Accept")],["<span class='mono2'>cust_seg</span>","Term: Customer segment","91%",btn("Accept")],["<span class='mono2'>ship_ctry</span>","Term: Shipping country","88%",btn("Accept")],["<span class='mono2'>notes_txt</span>","Class: Free text","64%",btn("Review",1)]]),
+   c("Suggested by Informatica","br")+c("Nothing applied until accepted"))},
+ "Lineage graph":{stage:"understand",what:"Interactive upstream and downstream lineage for any asset.",html:()=>shell("Lineage graph","DIM_CUSTOMER",
+   `<svg class="lg-svg" viewBox="0 0 760 200" width="100%" role="img" aria-label="Lineage from SAP and Salesforce through the golden customer to Snowflake and two consumers">
+     <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8fa3ba"/></marker></defs>
+     ${[[10,30,"SAP KNA1"],[10,130,"Salesforce Account"],[200,80,"Golden customer"],[420,80,"DIM_CUSTOMER"],[600,30,"Sales dashboard"],[600,130,"Agentforce agent"]].map(([x,y,t],i)=>`<rect x="${x}" y="${y}" width="${i===3?150:160}" height="40" rx="8" fill="${i===3?"#0b6bcb":"#e8f2fc"}" stroke="#bcd8f3"/><text x="${x+10}" y="${y+25}" style="fill:${i===3?"#fff":"inherit"}">${t}</text>`).join("")}
+     <path d="M170,50 L200,95" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M170,150 L200,105" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M360,100 L418,100" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M570,95 L598,55" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M570,105 L598,145" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+   </svg>`,
+   c("Column-level","br")+c("Click a node to expand"))},
+ "Job monitor":{stage:"transform",what:"Runs, failures and trends for pipelines, with drill-down.",html:()=>shell("Job monitor","Last 7 days",
+   `<div style="display:flex;align-items:flex-end;gap:10px;height:90px;margin-bottom:10px">${[[92,0],[95,0],[90,5],[97,0],[88,12],[96,0],[70,30]].map(([ok,f],i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:${f}%;background:#f2a7a0;border-radius:4px 4px 0 0"></div><div style="height:${ok-f>0?ok-f:ok}%;background:#8cc6f2;border-radius:${f?0:4}px ${f?0:4}px 4px 4px"></div><span style="font-size:11px;color:var(--muted);text-align:center">${["M","T","W","T","F","S","S"][i]}</span></div>`).join("")}</div>`
+   +tbl(["Job","Last run","Status"],[["<span class='mono2'>ORDERS_DAILY</span>","02:14",c("Failed","bad")],["<span class='mono2'>CUSTOMER_SYNC</span>","01:30",c("Succeeded","ok")],["<span class='mono2'>INVENTORY_CDC</span>","continuous",c("Running","br")]]),
+   c("1 failure needs attention","bad"))},
+ "Root cause, fix and rerun":{stage:"transform",what:"Explains why a job failed, proposes a fix, and reruns it on approval.",html:()=>shell("Troubleshooting","ORDERS_DAILY",
+   `<div class="mrow">${c("Failed at 02:14","bad")}<span style="color:var(--muted);font-size:13px">step 3 of 5 · m_open_orders</span></div>
+    <div class="mbox" style="margin-top:10px"><b>Root cause</b><div>New column <span class="mono2">DELIVERY_BLOCK</span> in SAP VBAK doesn't exist in the Snowflake target.</div></div>
+    <div class="mbox" style="margin-top:8px"><b>Proposed fix</b><div>Add the column to the mapping and the target table.</div></div>
+    <div class="mrow" style="margin-top:12px">${btn("Apply fix and rerun")}${btn("View logs",1)}</div>`,
+   c("Change is logged and reversible","br"))},
+ "Dev-to-prod review":{stage:"transform",what:"Compare assets between environments and approve promotion.",html:()=>shell("Asset promotion","Dev → Prod",
+   tbl(["Asset","Change","Conflict"],[["<span class='mono2'>m_open_orders</span>",c("Modified","warn"),c("None","ok")],["<span class='mono2'>tf_nightly_load</span>",c("New","br"),c("None","ok")],["<span class='mono2'>conn_snowflake</span>",c("Modified","warn"),c("Prod override","bad")]])
+   +`<div class="mrow" style="margin-top:12px">${btn("Promote 2 assets")}${btn("Resolve conflict",1)}</div>`,
+   c("Requires release manager approval","warn"))},
+ "Mapping review":{stage:"transform",what:"A visual diff of a mapping change before it's deployed.",html:()=>shell("Mapping review","m_open_orders · v7 → v8",
+   `<div class="mg m2"><div><b style="font-size:12.5px;color:var(--muted)">Before</b><div class="code2">select order_id,
+       kunnr,
+<span class="del">       net_value</span>
+from sap.vbak</div></div><div><b style="font-size:12.5px;color:var(--muted)">After</b><div class="code2">select order_id,
+       kunnr,
+<span class="add">       net_value * fx_rate as net_value_usd,</span>
+<span class="add">       delivery_block</span>
+from sap.vbak</div></div></div>
+   <div class="mrow" style="margin-top:12px">${btn("Deploy")}${btn("Request changes",1)}</div>`,
+   c("3 tests passed","ok")+c("Lineage impact: 2 downstream assets"))},
+ "Ingestion review":{stage:"deliver",what:"Review a new ingestion into the lakehouse: source, target, mode and schedule.",html:()=>shell("Ingestion review","SAP → Snowflake",
+   `<div class="mg m3" style="align-items:center"><div class="tilem"><span>Source</span><b>SAP S/4HANA</b><span>VBAK, VBAP</span></div><div style="text-align:center;font-size:22px;color:#0b6bcb">→</div><div class="tilem"><span>Target</span><b>Snowflake</b><span>RAW.SAP_ORDERS (Iceberg)</span></div></div>
+   <div class="mg m3" style="margin-top:10px"><div class="tilem"><span>Mode</span><b>CDC</b></div><div class="tilem"><span>Initial load</span><b>18.4M rows</b></div><div class="tilem"><span>Est. cost</span><b>~1,200 Flex Credits</b></div></div>
+   <div class="mrow" style="margin-top:12px">${btn("Start ingestion")}${btn("Edit",1)}</div>`,
+   c("PII columns masked on landing","br"))},
+ "Vector preview":{stage:"deliver",what:"Preview how documents become vectors: chunks, linked entities and permissions.",html:()=>shell("Vector preview","Contracts · 1,240 docs",
+   [["“…payment terms of net 45 days apply to all orders placed by Acme Corporation…”","Acme Corporation · GR-10482","Legal, Sales"],["“…either party may terminate with 90 days written notice…”","Termination clause","Legal"]].map(([t,e,p])=>`<div class="chunk" style="margin-bottom:8px">${t}<div class="meta">${c("Entity: "+e,"br")}${c("Visible to: "+p)}${c("Lineage kept","ok")}</div></div>`).join("")
+   +`<div class="mrow">${btn("Publish to vector store")}</div>`,
+   c("38,400 chunks")+c("Sensitive content redacted","ok"))},
+ "Data product builder":{stage:"deliver",what:"Package data as a product with a contract, SLA and owner, then publish.",html:()=>shell("Data product builder","Open orders by account",
+   `<div class="mg m2"><div class="tilem"><span>Owner</span><b>Sales Ops</b></div><div class="tilem"><span>Freshness SLA</span><b>Daily by 6:00</b></div><div class="tilem"><span>Quality threshold</span><b>≥ 95%</b></div><div class="tilem"><span>Access</span><b>Sales · PII masked</b></div></div>
+   <div style="margin-top:10px"><b style="font-size:12.5px;color:var(--muted)">Publish to</b><div class="mrow" style="margin-top:6px">${c("✓ Snowflake","ok")}${c("✓ Data 360","ok")}${c("✓ Semantic layer","ok")}${c("OKF knowledge doc")}</div></div>
+   <div class="mrow" style="margin-top:12px">${btn("Publish data product")}</div>`,
+   c("Contract (ODCS)","br")+c("Lineage to source"))},
+ "Access request":{stage:"deliver",what:"Approve governed access to a data product, with the terms policy requires.",html:()=>shell("Access request","Open orders by account",
+   tbl(["Requested for","Access","Terms"],[["<b>Sales team · EMEA</b> (42)","Read · Snowflake","PII masked · 12 months"]])
+   +`<div class="mbox" style="margin-top:10px">Requested by Jordan Lee via Claude · reason: <i>pipeline reviews for Q4</i></div>
+   <div class="mrow" style="margin-top:12px">${btn("Approve")}${btn("Approve with changes",1)}${btn("Decline",1)}</div>`,
+   c("You are the data owner","br"))},
+ "DQ scorecard":{stage:"trust",what:"Quality by dimension and trend for any asset.",html:()=>shell("Data quality scorecard","DIM_CUSTOMER",
+   `<div class="mg m4">${[["Completeness",92],["Validity",97],["Uniqueness",99],["Timeliness",95]].map(([n,v])=>`<div class="tilem"><span>${n}</span><div class="big2">${v}</div>${bar(v)}</div>`).join("")}</div>
+   <div class="mbox" style="margin-top:10px">Completeness dropped 3 points this week — 4,210 records missing <span class="mono2">email</span>.</div>`,
+   c("Overall 96","ok")+c("12 rules"))},
+ "Rule builder":{stage:"trust",what:"Suggested quality rules with an impact preview before they're added.",html:()=>shell("Rule builder","DIM_CUSTOMER",
+   `<div class="mbox"><b>Suggested rule</b><div class="mono2" style="margin-top:4px">email IS NOT NULL AND email matches valid format</div></div>
+   <div class="mg m3" style="margin-top:10px"><div class="tilem"><span>Would flag</span><b>4,210 records</b></div><div class="tilem"><span>Share</span><b>7.6%</b></div><div class="tilem"><span>Runs</span><b>Nightly</b></div></div>
+   <div class="mrow" style="margin-top:12px">${btn("Add rule to scorecard")}${btn("Edit rule",1)}</div>`,
+   c("Generated from profiling","br"))},
+ "Match and merge":{stage:"trust",what:"Candidate matches with scores and reasons, merged into a golden record.",html:()=>shell("Match","3 candidates",
+   `<div style="color:var(--muted);font-size:13px;margin-bottom:6px">Incoming · <b style="color:var(--ink)">ACME Corp., 1 Main St, Springfield</b></div>`
+   +tbl(["Candidate","Reasons","Score",""],[["<b>Acme Corporation</b><br><span style='font-size:12px;color:var(--muted)'>SAP · customer</span>",c("Name fuzzy","br")+" "+c("Tax ID exact","br"),"<b style='color:#1f7a3f'>96%</b>",c("Auto-match","ok")],["<b>ACME Corp</b><br><span style='font-size:12px;color:var(--muted)'>Salesforce · account</span>",c("Name exact","br")+" "+c("Address fuzzy","br"),"<b style='color:#1f7a3f'>92%</b>",btn("Match")],["<b>Acme Co. Holdings</b><br><span style='font-size:12px;color:var(--muted)'>Oracle · supplier</span>",c("Different tax ID","br"),"<b style='color:#b42318'>71%</b>",btn("Not a match",1)]])
+   +`<div class="mrow" style="margin-top:12px">${btn("Merge into golden record GR-10482")}</div>`,
+   c("Explainable","br")+c("Human in the loop"))},
+ "Stewardship inbox":{stage:"trust",what:"Tasks waiting for a data steward, prioritized, with one-click resolution.",html:()=>shell("Stewardship inbox","7 open",
+   tbl(["Task","Domain","Age",""],[["Possible duplicate · Globex Retail","Customer","2d",btn("Review")],["Missing tax ID · Northwind","Supplier","1d",btn("Review")],["Hierarchy change · EMEA","Customer","5h",btn("Review")],["Address could not be verified","Customer","3h",btn("Review")]]),
+   c("2 overdue","warn")+c("Assigned to you"))},
+ "Hierarchy explorer":{stage:"trust",what:"Browse and edit customer or product hierarchies.",html:()=>shell("Hierarchy explorer","Acme Corporation",
+   `<div class="tree"><div>▾ <b>Acme Corporation</b> ${c("GR-10482","br")}</div><div class="n"><div>▾ Acme Americas</div><div class="n"><div>• Acme Industrial GmbH</div><div>• Acme Logistics US</div></div><div>▾ Acme EMEA</div><div class="n"><div>• Acme Retail UK</div><div>• Acme France SAS ${c("Moved","warn")}</div></div></div></div>
+   <div class="mrow" style="margin-top:10px">${btn("Save changes")}${btn("Discard",1)}</div>`,
+   c("Changes need steward approval","warn"))},
+ "Policy decision":{stage:"trust",what:"Explains why access was allowed or blocked, and what to do next.",html:()=>shell("Policy decision","Sales-EMEA",
+   `<div class="mbox" style="background:#fdeceb;border-color:transparent;color:#1b2a3f"><b>Personal mobile numbers are blocked for your role.</b><div style="font-size:13px;margin-top:4px">Rule: PII.Contact is restricted for Sales Operations in EMEA.</div></div>
+   <div class="mrow" style="margin-top:12px">${btn("Use business number")}${btn("Request exception",1)}</div>`,
+   c("Blocked · personal data","bad")+c("Allowed · business contact","ok"))},
+ "Audit explorer":{stage:"trust",what:"Every call, by person and agent, with its policy decision and lineage.",html:()=>shell("Audit explorer","Today",
+   `<div class="mrow" style="margin-bottom:8px">${c("All agents","br")}${c("Claude")}${c("Agentforce")}${c("Copilot")}</div>`
+   +[["09:02","Jordan · Claude","Connect",c("Allowed","ok")],["09:07","Jordan · Claude","Read SAP + Salesforce",c("Allowed · masked","ok")],["09:15","Jordan · Claude","Match and merge",c("Approved","ok")],["09:17","Jordan · Claude","Read personal mobile",c("Blocked","bad")],["09:20","Priya · Agentforce","Read data product",c("Allowed","ok")]].map(([t,w,a,s])=>`<div class="ev"><span class="t mono2">${t}</span><span style="flex:1"><b>${a}</b><br><span style="color:var(--muted);font-size:12.5px">${w}</span></span>${s}</div>`).join(""),
+   c("Every agent · one log","br")+c("Export for audit"))}
+};
+const APPORDER=[];
+STAGES.forEach(st=>st.tools.forEach(t=>{ if(t[3]) APPORDER.push({name:t[3],op:t[0],rel:t[2],stage:st.name}); }));
+const viewer=document.getElementById("viewer");
+let vi=0, lastFocus=null;
+function showApp(i){
+  vi=(i+APPORDER.length)%APPORDER.length;
+  const a=APPORDER[vi], v=APPV[a.name];
+  document.getElementById("vtitle").textContent=a.name;
+  document.getElementById("vsub").textContent=`${a.stage} · ${a.op} · ${LABEL[a.rel]==="R1"?"Release 1":LABEL[a.rel]==="R2"?"Release 2":"Release 3"} — ${v?v.what:""}`;
+  document.getElementById("vbody").innerHTML=v?v.html():"";
+  document.getElementById("vcount").textContent=`${vi+1} of ${APPORDER.length}`;
+}
+function openApp(name){ lastFocus=document.activeElement; showApp(Math.max(0,APPORDER.findIndex(a=>a.name===name))); viewer.showModal(); }
+document.getElementById("vclose").addEventListener("click",()=>viewer.close());
+document.getElementById("vprev").addEventListener("click",()=>showApp(vi-1));
+document.getElementById("vnext").addEventListener("click",()=>showApp(vi+1));
+viewer.addEventListener("close",()=>{ if(lastFocus) lastFocus.focus(); });
+viewer.addEventListener("click",e=>{ if(e.target===viewer) viewer.close(); });
+document.addEventListener("keydown",e=>{ if(!viewer.open) return; if(e.key==="ArrowRight") showApp(vi+1); if(e.key==="ArrowLeft") showApp(vi-1); });
+document.querySelectorAll(".appbtn").forEach(b=>b.addEventListener("click",()=>openApp(b.dataset.app)));
+document.getElementById("browseApps").addEventListener("click",()=>openApp(APPORDER[0].name));
 </script>
 </body>
 </html>
