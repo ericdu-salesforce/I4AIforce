@@ -129,7 +129,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:v
 .appbtn{all:unset;cursor:pointer;display:block;font-size:11.5px;color:var(--blue);margin-top:2px;text-decoration:underline;text-underline-offset:2px}
 .appbtn:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:3px}
 .browse{margin-left:auto}
-dialog.viewer{border:0;padding:0;border-radius:18px;max-width:880px;width:calc(100% - 32px);background:var(--page);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog.viewer{border:0;padding:0;border-radius:18px;max-width:900px;width:calc(100% - 32px);background:var(--page);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
 dialog.viewer::backdrop{background:rgba(10,20,35,.55)}
 .vhead{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 10px}
 .vhead h3{margin:0;font-size:20px;color:var(--navy)}
@@ -180,6 +180,26 @@ dialog.viewer::backdrop{background:rgba(10,20,35,.55)}
 .chunk .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .lg-svg text{font:12px system-ui,sans-serif;fill:var(--ink)}
 @media (max-width:640px){.m2,.m3,.m4{grid-template-columns:1fr 1fr}}
+
+
+.vctx{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+.persona{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--ink2)}
+.persona b{color:var(--navy)}
+.pchip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;background:var(--navy);color:#fff;font-size:12.5px;font-weight:600}
+:root[data-theme="dark"] .pchip{background:#0b6bcb}
+.ask{align-self:flex-end;max-width:80%;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:8px 12px;font-size:14px}
+.ask small{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+.outcome{margin-top:10px;font-size:13.5px;color:var(--ink2)}
+.outcome b{color:#1f7a3f}
+.spark{display:flex;align-items:flex-end;gap:2px;height:22px}
+.spark i{display:block;width:5px;background:#8cc6f2;border-radius:2px}
+.kpi{display:flex;flex-direction:column}
+.kpi span{font-size:11.5px;color:var(--muted)}
+.kpi b{font-size:18px}
+.impact{border-left:4px solid #e0a13a;background:#fdf6ea;border-radius:8px;padding:8px 10px;font-size:13px;color:#4a3410;margin-top:10px}
+.good{border-left:4px solid #1f7a3f;background:#eef8f1;border-radius:8px;padding:8px 10px;font-size:13px;color:#16432a;margin-top:10px}
+.fld{border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:13px;background:var(--surface)}
+.fld span{display:block;font-size:11px;color:var(--muted)}
 
 </style>
 </head>
@@ -322,126 +342,195 @@ document.querySelectorAll(".chip[data-f]").forEach(b=>b.addEventListener("click"
   });
 }));
 
+
 /* ---------------- MCP App visuals ---------------- */
 const shell=(title,right,body,foot)=>`<div class="mapp"><div class="mapp-h"><span class="lg">i</span>Informatica · ${title}${right?`<span class="r">${right}</span>`:""}</div><div class="mapp-b">${body}</div>${foot?`<div class="mapp-f">${foot}</div>`:""}</div>`;
 const c=(t,k="")=>`<span class="c ${k}">${t}</span>`;
 const tbl=(h,rows)=>`<table class="mt"><thead><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 const btn=(t,sec)=>`<span class="mbtn${sec?" sec":""}">${t}</span>`;
 const bar=p=>`<div class="bar2"><i style="width:${p}%"></i></div>`;
+const spark=a=>`<span class="spark">${a.map(v=>`<i style="height:${v}%"></i>`).join("")}</span>`;
+const kpi=(l,v)=>`<div class="kpi"><span>${l}</span><b>${v}</b></div>`;
+const fld=(l,v)=>`<div class="fld"><span>${l}</span>${v}</div>`;
+const muted=t=>`<span style="color:var(--muted);font-size:12.5px">${t}</span>`;
 
 const APPV={
- "Connection health":{stage:"connect",what:"Test every connection, see what's broken, and fix it in place.",html:()=>shell("Connection health","4 tested",
-   tbl(["Source","Mode","Latency","Status"],[["<b>SAP S/4HANA</b>","CDC","120 ms",c("Healthy","ok")],["<b>Salesforce</b>","Real time","85 ms",c("Healthy","ok")],["<b>Snowflake</b>","Batch","210 ms",c("Healthy","ok")],["<b>Oracle EBS</b>","Batch","—",c("Secure agent offline","bad")]])
-   +`<div class="mrow" style="margin-top:12px">${btn("Restart Oracle secure agent")}${btn("Test again",1)}</div>`,
-   c("Credentials held by Informatica","br")+c("Read-only test"))},
- "Runtime status":{stage:"connect",what:"All secure agents and runtimes at a glance, with capacity and health.",html:()=>shell("Runtime status","6 runtimes",
-   `<div class="mg m3">${[["us-east-agent-01","Healthy","ok",62],["us-east-agent-02","Healthy","ok",48],["eu-west-agent-01","High load","warn",91],["apac-agent-01","Healthy","ok",35],["serverless-us","Healthy","ok",20],["onprem-dc-02","Offline","bad",0]].map(([n,s,k,p])=>`<div class="tilem"><b class="mono2">${n}</b><div style="margin:6px 0">${c(s,k)}</div>${bar(p)}<span>${p}% capacity</span></div>`).join("")}</div>`,
-   c("1 needs attention","warn")+c("Auto-scale available"))},
- "Catalog search":{stage:"understand",what:"Search results with certification, quality and ownership, ready to explore.",html:()=>shell("Catalog search","“customer” · 3 results",
-   [["DIM_CUSTOMER","Snowflake · table","Certified","96","Sales Ops"],["Account","Salesforce · object","Certified","93","CRM team"],["KNA1 · customers","SAP S/4HANA · table","Certified","91","Finance IT"]].map(([n,t,cert,q,o])=>`<div class="mbox" style="margin-bottom:8px;display:flex;align-items:center;gap:12px"><div style="flex:1"><b>${n}</b> ${c(cert,"ok")}<div style="color:var(--muted);font-size:12.5px">${t} · owner ${o}</div></div><div style="text-align:right"><div class="big2">${q}</div><span style="font-size:12px;color:var(--muted)">quality</span></div></div>`).join(""),
-   c("Governed results","br")+c("Filtered to your access"))},
- "Asset profile":{stage:"understand",what:"Everything about one asset: schema, owner, glossary terms and quality.",html:()=>shell("Asset profile","DIM_CUSTOMER",
-   `<div class="mg m3" style="margin-bottom:10px"><div class="tilem"><span>Owner</span><b>Sales Ops</b></div><div class="tilem"><span>Rows</span><b>55,120</b></div><div class="tilem"><span>Quality</span><b>96 / 100</b></div></div>`
-   +tbl(["Column","Type","Glossary term","Class"],[["<span class='mono2'>customer_id</span>","string","Customer ID",c("Key","br")],["<span class='mono2'>email</span>","string","Contact email",c("PII","warn")],["<span class='mono2'>segment</span>","string","Customer segment",""],["<span class='mono2'>golden_id</span>","string","Golden record ID",c("MDM","br")]]),
-   c("Certified","ok")+c("Updated 2h ago"))},
- "Enrichment review":{stage:"understand",what:"Review suggested classifications and glossary terms before they're applied.",html:()=>shell("Enrichment review","5 suggestions",
-   tbl(["Column","Suggestion","Confidence",""],[["<span class='mono2'>phone_mobile</span>","Class: PII · Phone","98%",btn("Accept")],["<span class='mono2'>cust_seg</span>","Term: Customer segment","91%",btn("Accept")],["<span class='mono2'>ship_ctry</span>","Term: Shipping country","88%",btn("Accept")],["<span class='mono2'>notes_txt</span>","Class: Free text","64%",btn("Review",1)]]),
-   c("Suggested by Informatica","br")+c("Nothing applied until accepted"))},
- "Lineage graph":{stage:"understand",what:"Interactive upstream and downstream lineage for any asset.",html:()=>shell("Lineage graph","DIM_CUSTOMER",
-   `<svg class="lg-svg" viewBox="0 0 760 200" width="100%" role="img" aria-label="Lineage from SAP and Salesforce through the golden customer to Snowflake and two consumers">
+ "Connection health":{persona:"Platform admin",usecase:"Morning check after overnight load failures",prompt:"Why did last night's loads fail? Check our source connections.",
+  outcome:"Found the one broken connection, saw the 3 jobs it blocks, and fixed it without leaving Claude.",
+  html:()=>shell("Connection health","12 connections · 1 failing",
+   tbl(["Source","Mode","Last success","Jobs using it","Status"],[["<b>SAP S/4HANA</b>","CDC","2 min ago","14",c("Healthy","ok")],["<b>Salesforce</b>","Real time","just now","9",c("Healthy","ok")],["<b>Snowflake</b>","Batch","01:30","22",c("Healthy","ok")],["<b>Oracle EBS</b>","Batch","yesterday 23:10","3",c("Agent offline","bad")]])
+   +`<div class="impact"><b>Impact:</b> ORDERS_DAILY, AR_AGING and SUPPLIER_SYNC can't run until Oracle EBS is reachable. Cause: secure agent onprem-dc-02 stopped after an OS patch at 00:40.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Restart agent onprem-dc-02")}${btn("Rerun 3 blocked jobs",1)}</div>`,
+   c("Credentials held by Informatica","br")+c("Tests are read-only"))},
+ "Runtime status":{persona:"Platform admin",usecase:"Capacity planning before quarter-end close",prompt:"Do we have enough runtime capacity for quarter-end close next week?",
+  outcome:"Spotted the one region that will run out, and added capacity with the cost shown up front.",
+  html:()=>shell("Runtime status","Forecast · quarter-end",
+   `<div class="mg m3">${[["us-east","Healthy","ok",62,74],["eu-west","At risk","warn",78,118],["apac","Healthy","ok",35,52]].map(([n,s,k,now,peak])=>`<div class="tilem"><b class="mono2">${n}</b><div style="margin:6px 0">${c(s,k)}</div>${bar(Math.min(now,100))}<span>${now}% today · ${peak}% forecast peak</span></div>`).join("")}</div>
+   <div class="impact"><b>eu-west</b> will exceed capacity on Thursday between 01:00 and 04:00, when 38 close jobs run together.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Add 2 serverless nodes · ~340 Flex Credits")}${btn("Reschedule 6 jobs",1)}</div>`,
+   c("Forecast from the last 4 quarter-ends","br"))},
+ "Catalog search":{persona:"Business analyst",usecase:"Finding trusted data for a report",prompt:"I need trusted customer data for the Q4 churn report. What should I use?",
+  outcome:"Picked the right dataset in one step, knowing it's certified, fresh and used by others for the same purpose.",
+  html:()=>shell("Catalog search","“customer churn” · 3 results",
+   [["DIM_CUSTOMER","One row per customer, merged from SAP and Salesforce","Recommended for reporting","ok","96","Today 06:00","41 reports"],["CHURN_FEATURES","Monthly churn signals per account","Certified","ok","93","Yesterday","12 models"],["Account (Salesforce)","Raw CRM accounts, not de-duplicated","Not for reporting","warn","81","Real time","—"]].map(([n,d,badge,k,q,f,u])=>`<div class="mbox" style="margin-bottom:8px"><div class="mrow" style="justify-content:space-between"><div><b>${n}</b> ${c(badge,k)}</div><div class="mrow">${kpi("Quality",q)}${kpi("Fresh",f)}${kpi("Used by",u)}</div></div><div style="font-size:13px;margin-top:4px">${d}</div></div>`).join("")
+   +`<div class="mrow">${btn("Use DIM_CUSTOMER")}${btn("Compare",1)}</div>`,
+   c("Only data you're allowed to see","br"))},
+ "Asset profile":{persona:"Business analyst",usecase:"Checking a dataset before using it",prompt:"Tell me about DIM_CUSTOMER before I build on it.",
+  outcome:"Understood what the data means, how fresh it is, and its known issues — before building on it.",
+  html:()=>shell("Asset profile","DIM_CUSTOMER",
+   `<div class="mbox"><b>In plain words:</b> one row per customer, merged from SAP and Salesforce into golden records. Refreshed daily at 06:00.</div>
+   <div class="mg m4" style="margin-top:10px">${kpi("Owner","Sales Ops")}${kpi("Rows","55,120")}${kpi("Quality","96")}${kpi("Certified","Yes")}</div>
+   <div class="impact"><b>Known issue:</b> 7.6% of rows have no email — don't use email for outreach counts.</div>`
+   +`<div style="margin-top:10px">${tbl(["Field","Means","Note"],[["<span class='mono2'>segment</span>","Customer segment (SMB, Mid, Enterprise)",""],["<span class='mono2'>arr_usd</span>","Annual recurring revenue, USD",c("Finance-approved","ok")],["<span class='mono2'>email</span>","Primary contact email",c("PII · masked","warn")]])}</div>`,
+   c("Questions others asked: “active customers by region”","br"))},
+ "Enrichment review":{persona:"Data steward",usecase:"Classifying a newly scanned dataset",prompt:"Review the classification suggestions for the new Contracts dataset.",
+  outcome:"Applied 4 classifications in one pass, with evidence for each and the policies they switch on.",
+  html:()=>shell("Enrichment review","Contracts · 6 suggestions",
+   tbl(["Column","Suggested","Evidence","Turns on"],[["<span class='mono2'>signer_phone</span>",c("PII · Phone","warn"),muted("98% match · +1 (415) •••-••12"),"Masking"],["<span class='mono2'>tax_id</span>",c("PII · Tax ID","warn"),muted("97% match · format XX-XXXXXXX"),"Masking, access"],["<span class='mono2'>renewal_dt</span>",c("Term: Renewal date","br"),muted("91% · name + values"),"—"],["<span class='mono2'>notes_txt</span>",c("Free text","br"),muted("64% · review"),"Redaction"]])
+   +`<div class="mrow" style="margin-top:10px">${btn("Accept 3 high-confidence")}${btn("Review 1",1)}</div>`,
+   c("Nothing applies until you accept","br"))},
+ "Lineage graph":{persona:"Data engineer",usecase:"Impact analysis before a change",prompt:"What breaks downstream if I change DIM_CUSTOMER.segment?",
+  outcome:"Saw exactly what depends on the column and notified the owners before making the change.",
+  html:()=>shell("Lineage graph","Impact of DIM_CUSTOMER.segment",
+   `<svg class="lg-svg" viewBox="0 0 760 210" width="100%" role="img" aria-label="Lineage and impact for DIM_CUSTOMER.segment">
      <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8fa3ba"/></marker></defs>
-     ${[[10,30,"SAP KNA1"],[10,130,"Salesforce Account"],[200,80,"Golden customer"],[420,80,"DIM_CUSTOMER"],[600,30,"Sales dashboard"],[600,130,"Agentforce agent"]].map(([x,y,t],i)=>`<rect x="${x}" y="${y}" width="${i===3?150:160}" height="40" rx="8" fill="${i===3?"#0b6bcb":"#e8f2fc"}" stroke="#bcd8f3"/><text x="${x+10}" y="${y+25}" style="fill:${i===3?"#fff":"inherit"}">${t}</text>`).join("")}
-     <path d="M170,50 L200,95" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
-     <path d="M170,150 L200,105" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
-     <path d="M360,100 L418,100" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
-     <path d="M570,95 L598,55" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
-     <path d="M570,105 L598,145" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
-   </svg>`,
-   c("Column-level","br")+c("Click a node to expand"))},
- "Job monitor":{stage:"transform",what:"Runs, failures and trends for pipelines, with drill-down.",html:()=>shell("Job monitor","Last 7 days",
-   `<div style="display:flex;align-items:flex-end;gap:10px;height:90px;margin-bottom:10px">${[[92,0],[95,0],[90,5],[97,0],[88,12],[96,0],[70,30]].map(([ok,f],i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:${f}%;background:#f2a7a0;border-radius:4px 4px 0 0"></div><div style="height:${ok-f>0?ok-f:ok}%;background:#8cc6f2;border-radius:${f?0:4}px ${f?0:4}px 4px 4px"></div><span style="font-size:11px;color:var(--muted);text-align:center">${["M","T","W","T","F","S","S"][i]}</span></div>`).join("")}</div>`
-   +tbl(["Job","Last run","Status"],[["<span class='mono2'>ORDERS_DAILY</span>","02:14",c("Failed","bad")],["<span class='mono2'>CUSTOMER_SYNC</span>","01:30",c("Succeeded","ok")],["<span class='mono2'>INVENTORY_CDC</span>","continuous",c("Running","br")]]),
-   c("1 failure needs attention","bad"))},
- "Root cause, fix and rerun":{stage:"transform",what:"Explains why a job failed, proposes a fix, and reruns it on approval.",html:()=>shell("Troubleshooting","ORDERS_DAILY",
-   `<div class="mrow">${c("Failed at 02:14","bad")}<span style="color:var(--muted);font-size:13px">step 3 of 5 · m_open_orders</span></div>
-    <div class="mbox" style="margin-top:10px"><b>Root cause</b><div>New column <span class="mono2">DELIVERY_BLOCK</span> in SAP VBAK doesn't exist in the Snowflake target.</div></div>
-    <div class="mbox" style="margin-top:8px"><b>Proposed fix</b><div>Add the column to the mapping and the target table.</div></div>
-    <div class="mrow" style="margin-top:12px">${btn("Apply fix and rerun")}${btn("View logs",1)}</div>`,
-   c("Change is logged and reversible","br"))},
- "Dev-to-prod review":{stage:"transform",what:"Compare assets between environments and approve promotion.",html:()=>shell("Asset promotion","Dev → Prod",
-   tbl(["Asset","Change","Conflict"],[["<span class='mono2'>m_open_orders</span>",c("Modified","warn"),c("None","ok")],["<span class='mono2'>tf_nightly_load</span>",c("New","br"),c("None","ok")],["<span class='mono2'>conn_snowflake</span>",c("Modified","warn"),c("Prod override","bad")]])
-   +`<div class="mrow" style="margin-top:12px">${btn("Promote 2 assets")}${btn("Resolve conflict",1)}</div>`,
-   c("Requires release manager approval","warn"))},
- "Mapping review":{stage:"transform",what:"A visual diff of a mapping change before it's deployed.",html:()=>shell("Mapping review","m_open_orders · v7 → v8",
-   `<div class="mg m2"><div><b style="font-size:12.5px;color:var(--muted)">Before</b><div class="code2">select order_id,
-       kunnr,
+     ${[[10,40,"SAP KNA1",0],[10,140,"Salesforce Account",0],[200,90,"Golden customer",0],[380,90,"DIM_CUSTOMER.segment",2],[600,10,"Churn dashboard",1],[600,80,"Board revenue report",1],[600,150,"Renewals agent",1]].map(([x,y,t,k])=>`<rect x="${x}" y="${y}" width="${k===2?190:160}" height="40" rx="8" fill="${k===2?"#0b6bcb":k===1?"#fdf1dc":"#e8f2fc"}" stroke="${k===1?"#e0a13a":"#bcd8f3"}"/><text x="${x+10}" y="${y+25}" style="fill:${k===2?"#fff":"#1b2a3f"}">${t}</text>`).join("")}
+     <path d="M170,60 L200,105" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M170,160 L200,115" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M360,110 L378,110" stroke="#8fa3ba" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M570,100 L598,35" stroke="#e0a13a" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M570,110 L598,100" stroke="#e0a13a" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+     <path d="M570,120 L598,168" stroke="#e0a13a" stroke-width="2" marker-end="url(#ah)" fill="none"/>
+   </svg>
+   <div class="impact"><b>3 affected:</b> Churn dashboard (Marketing), Board revenue report (Finance), Renewals agent (Sales). Owners: 3 people.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Notify 3 owners")}${btn("Open impact report",1)}</div>`,
+   c("Column-level lineage","br"))},
+ "Job monitor":{persona:"Data engineer",usecase:"Daily pipeline health and SLA check",prompt:"How did our pipelines do this week? Anything at risk for the 6:00 SLA?",
+  outcome:"Knew which pipeline threatens the 6:00 SLA before anyone downstream noticed.",
+  html:()=>shell("Job monitor","Last 7 days · 58 jobs",
+   `<div class="mg m4" style="margin-bottom:10px">${kpi("Success rate","97.4%")}${kpi("Failed","4")}${kpi("SLA met","55 / 58")}${kpi("Credits used","41,200")}</div>`
+   +tbl(["Job","Trend (runtime)","Last run","SLA 06:00"],[["<span class='mono2'>ORDERS_DAILY</span>",spark([40,42,45,44,50,62,100]),c("Failed 02:14","bad"),c("At risk","bad")],["<span class='mono2'>CUSTOMER_SYNC</span>",spark([50,48,52,50,51,49,50]),c("OK 01:30","ok"),c("Met","ok")],["<span class='mono2'>REVENUE_MART</span>",spark([40,45,55,62,70,78,85]),c("OK 04:52","ok"),c("Trending late","warn")]]),
+   c("Runtime creeping up on REVENUE_MART","warn"))},
+ "Root cause, fix and rerun":{persona:"Data engineer",usecase:"Fixing a failed production job",prompt:"Why did ORDERS_DAILY fail? Fix it and rerun.",
+  outcome:"Went from failure to fixed in minutes, with the evidence, the change and the rerun in one place.",
+  html:()=>shell("Troubleshooting","ORDERS_DAILY · failed 02:14",
+   `<div class="ev"><span class="t mono2">01:58</span><span style="flex:1">SAP change detected: column <span class="mono2">DELIVERY_BLOCK</span> added to VBAK</span></div>
+   <div class="ev"><span class="t mono2">02:14</span><span style="flex:1">Load to Snowflake failed: <span class="mono2">column count mismatch (41 vs 40)</span></span></div>
+   <div class="mbox" style="margin-top:10px"><b>Proposed fix:</b> add <span class="mono2">delivery_block VARCHAR(2)</span> to the mapping and to <span class="mono2">SALES.OPEN_ORDERS</span>. Tested on yesterday's data: ${c("passed","ok")}</div>
+   <div class="impact"><b>Waiting on this job:</b> Sales pipeline dashboard and the 06:00 forecast refresh.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Apply fix and rerun")}${btn("Open ticket instead",1)}</div>`,
+   c("Change logged and reversible","br"))},
+ "Dev-to-prod review":{persona:"Release manager",usecase:"Weekly promotion to production",prompt:"Promote this week's pipeline changes to production.",
+  outcome:"Promoted what was ready, held back the one conflict, with approvals and a change record created.",
+  html:()=>shell("Asset promotion","Dev → Prod · release 2026.42",
+   tbl(["Asset","Author","Tests","Approval","Conflict"],[["<span class='mono2'>m_open_orders</span>","Priya S.",c("12/12","ok"),c("Approved","ok"),c("None","ok")],["<span class='mono2'>tf_nightly_load</span>","Marco R.",c("5/5","ok"),c("Approved","ok"),c("None","ok")],["<span class='mono2'>conn_snowflake</span>","Priya S.",c("3/3","ok"),c("Pending","warn"),c("Prod override","bad")]])
+   +`<div class="mrow" style="margin-top:10px">${btn("Promote 2 ready assets")}${btn("Hold conn_snowflake",1)}</div>`,
+   c("Change record CHG-20418 created","br"))},
+ "Mapping review":{persona:"Data engineer",usecase:"Peer review of a pipeline change",prompt:"Review Priya's change to m_open_orders.",
+  outcome:"Approved the change after seeing the code, the tests and what the output rows will look like.",
+  html:()=>shell("Mapping review","m_open_orders · v7 → v8 · by Priya S.",
+   `<div class="mg m2"><div><b style="font-size:12px;color:var(--muted)">Before</b><div class="code2">select order_id, kunnr,
 <span class="del">       net_value</span>
-from sap.vbak</div></div><div><b style="font-size:12.5px;color:var(--muted)">After</b><div class="code2">select order_id,
-       kunnr,
+from sap.vbak</div></div><div><b style="font-size:12px;color:var(--muted)">After</b><div class="code2">select order_id, kunnr,
 <span class="add">       net_value * fx_rate as net_value_usd,</span>
 <span class="add">       delivery_block</span>
-from sap.vbak</div></div></div>
-   <div class="mrow" style="margin-top:12px">${btn("Deploy")}${btn("Request changes",1)}</div>`,
-   c("3 tests passed","ok")+c("Lineage impact: 2 downstream assets"))},
- "Ingestion review":{stage:"deliver",what:"Review a new ingestion into the lakehouse: source, target, mode and schedule.",html:()=>shell("Ingestion review","SAP → Snowflake",
-   `<div class="mg m3" style="align-items:center"><div class="tilem"><span>Source</span><b>SAP S/4HANA</b><span>VBAK, VBAP</span></div><div style="text-align:center;font-size:22px;color:#0b6bcb">→</div><div class="tilem"><span>Target</span><b>Snowflake</b><span>RAW.SAP_ORDERS (Iceberg)</span></div></div>
-   <div class="mg m3" style="margin-top:10px"><div class="tilem"><span>Mode</span><b>CDC</b></div><div class="tilem"><span>Initial load</span><b>18.4M rows</b></div><div class="tilem"><span>Est. cost</span><b>~1,200 Flex Credits</b></div></div>
-   <div class="mrow" style="margin-top:12px">${btn("Start ingestion")}${btn("Edit",1)}</div>`,
-   c("PII columns masked on landing","br"))},
- "Vector preview":{stage:"deliver",what:"Preview how documents become vectors: chunks, linked entities and permissions.",html:()=>shell("Vector preview","Contracts · 1,240 docs",
-   [["“…payment terms of net 45 days apply to all orders placed by Acme Corporation…”","Acme Corporation · GR-10482","Legal, Sales"],["“…either party may terminate with 90 days written notice…”","Termination clause","Legal"]].map(([t,e,p])=>`<div class="chunk" style="margin-bottom:8px">${t}<div class="meta">${c("Entity: "+e,"br")}${c("Visible to: "+p)}${c("Lineage kept","ok")}</div></div>`).join("")
-   +`<div class="mrow">${btn("Publish to vector store")}</div>`,
-   c("38,400 chunks")+c("Sensitive content redacted","ok"))},
- "Data product builder":{stage:"deliver",what:"Package data as a product with a contract, SLA and owner, then publish.",html:()=>shell("Data product builder","Open orders by account",
-   `<div class="mg m2"><div class="tilem"><span>Owner</span><b>Sales Ops</b></div><div class="tilem"><span>Freshness SLA</span><b>Daily by 6:00</b></div><div class="tilem"><span>Quality threshold</span><b>≥ 95%</b></div><div class="tilem"><span>Access</span><b>Sales · PII masked</b></div></div>
-   <div style="margin-top:10px"><b style="font-size:12.5px;color:var(--muted)">Publish to</b><div class="mrow" style="margin-top:6px">${c("✓ Snowflake","ok")}${c("✓ Data 360","ok")}${c("✓ Semantic layer","ok")}${c("OKF knowledge doc")}</div></div>
-   <div class="mrow" style="margin-top:12px">${btn("Publish data product")}</div>`,
-   c("Contract (ODCS)","br")+c("Lineage to source"))},
- "Access request":{stage:"deliver",what:"Approve governed access to a data product, with the terms policy requires.",html:()=>shell("Access request","Open orders by account",
-   tbl(["Requested for","Access","Terms"],[["<b>Sales team · EMEA</b> (42)","Read · Snowflake","PII masked · 12 months"]])
-   +`<div class="mbox" style="margin-top:10px">Requested by Jordan Lee via Claude · reason: <i>pipeline reviews for Q4</i></div>
-   <div class="mrow" style="margin-top:12px">${btn("Approve")}${btn("Approve with changes",1)}${btn("Decline",1)}</div>`,
+from sap.vbak</div></div></div>`
+   +`<div style="margin-top:10px">${tbl(["order_id","net_value (v7)","net_value_usd (v8)"],[["4500012","€ 12,400","$ 13,392"],["4500013","€ 8,050","$ 8,694"]])}</div>
+   <div class="mrow" style="margin-top:10px">${btn("Approve")}${btn("Request changes",1)}</div>`,
+   c("3 tests passed","ok")+c("2 downstream assets affected","warn"))},
+ "Ingestion review":{persona:"Data engineer",usecase:"Landing a new source in the lakehouse",prompt:"Land SAP sales orders in Snowflake as Iceberg, continuously.",
+  outcome:"Started a governed CDC ingestion knowing the cost, the PII handling and the schedule up front.",
+  html:()=>shell("Ingestion review","SAP → Snowflake (Iceberg)",
+   `<div class="mg m3" style="align-items:center"><div class="tilem"><span>Source</span><b>SAP S/4HANA</b><span>VBAK, VBAP · 18.4M rows</span></div><div style="text-align:center;font-size:22px;color:#0b6bcb">→</div><div class="tilem"><span>Target</span><b>Snowflake</b><span>RAW.SAP_ORDERS · Iceberg</span></div></div>
+   <div class="mg m4" style="margin-top:10px">${fld("Mode","CDC · continuous")}${fld("Initial load","~40 min")}${fld("Monthly cost","~3,600 Flex Credits")}${fld("PII","2 columns masked")}</div>
+   <div class="mrow" style="margin-top:10px">${btn("Start ingestion")}${btn("Change settings",1)}</div>`,
+   c("Registered in the catalog on landing","br"))},
+ "Vector preview":{persona:"AI engineer",usecase:"Preparing documents for an agent's retrieval",prompt:"Prepare our customer contracts for the support agent's retrieval.",
+  outcome:"Shipped a governed vector index, tested against real questions, with permissions kept per chunk.",
+  html:()=>shell("Vector preview","Contracts · 1,240 docs → 38,400 chunks",
+   [["“…payment terms of net 45 days apply to all orders placed by Acme Corporation…”","Acme Corporation · GR-10482","Support, Legal"],["“…either party may terminate with 90 days written notice…”","Clause: Termination","Legal only"]].map(([t,e,p])=>`<div class="chunk" style="margin-bottom:8px">${t}<div class="meta">${c("Entity: "+e,"br")}${c("Visible to: "+p)}</div></div>`).join("")
+   +`<div class="good"><b>Retrieval test:</b> 18 of 20 support questions returned the right clause. 2 misses are in scanned PDFs — OCR suggested.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Publish index")}${btn("Run OCR on 64 scans",1)}</div>`,
+   c("Sensitive content redacted","ok")+c("Lineage per chunk"))},
+ "Data product builder":{persona:"Data product owner",usecase:"Publishing data for a business team",prompt:"Publish Open orders by account as a data product for Sales.",
+  outcome:"Published a product with a contract Sales can rely on, and every quality gate green.",
+  html:()=>shell("Data product builder","Open orders by account · v1.0",
+   `<div class="mg m4">${fld("Owner","Sales Ops")}${fld("Freshness SLA","Daily by 06:00")}${fld("Quality gate","≥ 95%")}${fld("Access","Sales · PII masked")}</div>
+   <div style="margin-top:10px">${tbl(["Gate","Result"],[["Schema matches contract",c("Pass","ok")],["Quality 98% ≥ 95%",c("Pass","ok")],["Freshness: last load 05:12",c("Pass","ok")]])}</div>
+   <div class="mrow" style="margin-top:10px">${c("✓ Snowflake","ok")}${c("✓ Data 360","ok")}${c("✓ Semantic layer","ok")}${c("OKF doc")}</div>
+   <div class="mrow" style="margin-top:10px">${btn("Publish v1.0")}</div>`,
+   c("Contract (ODCS)","br")+c("Subscribers notified on change"))},
+ "Access request":{persona:"Data product owner",usecase:"Approving access to a data product",prompt:"Show me pending access requests for my data products.",
+  outcome:"Approved the low-risk request in one click, with policy checks already done.",
+  html:()=>shell("Access requests","2 pending",
+   tbl(["Requested by","Product","Purpose","Checks","Risk"],[["Jordan Lee · Sales EMEA (42)","Open orders by account","Q4 pipeline reviews",c("PII masked ✓","ok")+" "+c("Region ✓","ok"),c("Low","ok")],["Vendor analytics team","DIM_CUSTOMER","Campaign targeting",c("External party ✗","bad"),c("High","bad")]])
+   +`<div class="mrow" style="margin-top:10px">${btn("Approve Jordan · 12 months")}${btn("Decline vendor request",1)}</div>`,
    c("You are the data owner","br"))},
- "DQ scorecard":{stage:"trust",what:"Quality by dimension and trend for any asset.",html:()=>shell("Data quality scorecard","DIM_CUSTOMER",
-   `<div class="mg m4">${[["Completeness",92],["Validity",97],["Uniqueness",99],["Timeliness",95]].map(([n,v])=>`<div class="tilem"><span>${n}</span><div class="big2">${v}</div>${bar(v)}</div>`).join("")}</div>
-   <div class="mbox" style="margin-top:10px">Completeness dropped 3 points this week — 4,210 records missing <span class="mono2">email</span>.</div>`,
-   c("Overall 96","ok")+c("12 rules"))},
- "Rule builder":{stage:"trust",what:"Suggested quality rules with an impact preview before they're added.",html:()=>shell("Rule builder","DIM_CUSTOMER",
-   `<div class="mbox"><b>Suggested rule</b><div class="mono2" style="margin-top:4px">email IS NOT NULL AND email matches valid format</div></div>
-   <div class="mg m3" style="margin-top:10px"><div class="tilem"><span>Would flag</span><b>4,210 records</b></div><div class="tilem"><span>Share</span><b>7.6%</b></div><div class="tilem"><span>Runs</span><b>Nightly</b></div></div>
-   <div class="mrow" style="margin-top:12px">${btn("Add rule to scorecard")}${btn("Edit rule",1)}</div>`,
-   c("Generated from profiling","br"))},
- "Match and merge":{stage:"trust",what:"Candidate matches with scores and reasons, merged into a golden record.",html:()=>shell("Match","3 candidates",
-   `<div style="color:var(--muted);font-size:13px;margin-bottom:6px">Incoming · <b style="color:var(--ink)">ACME Corp., 1 Main St, Springfield</b></div>`
-   +tbl(["Candidate","Reasons","Score",""],[["<b>Acme Corporation</b><br><span style='font-size:12px;color:var(--muted)'>SAP · customer</span>",c("Name fuzzy","br")+" "+c("Tax ID exact","br"),"<b style='color:#1f7a3f'>96%</b>",c("Auto-match","ok")],["<b>ACME Corp</b><br><span style='font-size:12px;color:var(--muted)'>Salesforce · account</span>",c("Name exact","br")+" "+c("Address fuzzy","br"),"<b style='color:#1f7a3f'>92%</b>",btn("Match")],["<b>Acme Co. Holdings</b><br><span style='font-size:12px;color:var(--muted)'>Oracle · supplier</span>",c("Different tax ID","br"),"<b style='color:#b42318'>71%</b>",btn("Not a match",1)]])
-   +`<div class="mrow" style="margin-top:12px">${btn("Merge into golden record GR-10482")}</div>`,
+ "DQ scorecard":{persona:"Data owner",usecase:"Deciding if data is fit for a purpose",prompt:"Is DIM_CUSTOMER good enough for the board revenue report?",
+  outcome:"Got a clear yes-or-no for the purpose, with the one issue to fix first.",
+  html:()=>shell("Data quality scorecard","DIM_CUSTOMER · for board reporting (≥ 95)",
+   `<div class="mg m4">${[["Completeness",92],["Validity",97],["Uniqueness",99],["Timeliness",98]].map(([n,v])=>`<div class="tilem"><span>${n}</span><div class="big2" style="color:${v<95?"#b42318":"inherit"}">${v}</div>${bar(v)}</div>`).join("")}</div>
+   <div class="impact"><b>Not yet:</b> completeness is 92, below the 95 needed for board reporting. Cause: 4,210 customers without an email — doesn't affect revenue fields.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Certify for revenue fields only")}${btn("Create fix task",1)}</div>`,
+   c("Trend: stable for 30 days","br"))},
+ "Rule builder":{persona:"Data quality analyst",usecase:"Adding a quality rule",prompt:"Add a rule to catch bad emails in DIM_CUSTOMER.",
+  outcome:"Added a rule after seeing exactly which records it catches and who gets notified.",
+  html:()=>shell("Rule builder","DIM_CUSTOMER.email",
+   `<div class="mbox"><b>Rule</b><div class="mono2" style="margin-top:4px">email IS NOT NULL AND email ~ valid format AND domain NOT IN (test, example)</div></div>
+   <div style="margin-top:10px">${tbl(["Would fail","Why"],[["j•••@acme","Invalid format"],["(empty)","Missing"],["o•••@example.com","Test domain"]])}</div>
+   <div class="mg m3" style="margin-top:10px">${kpi("Records flagged","4,388")}${kpi("Share","7.9%")}${kpi("Notify","Sales Ops")}</div>
+   <div class="mrow" style="margin-top:10px">${btn("Add to scorecard")}${btn("Edit",1)}</div>`,
+   c("Runs nightly with the scorecard","br"))},
+ "Match and merge":{persona:"Sales operations analyst",usecase:"Checking a new lead against existing customers",prompt:"A new lead came in: ACME Corp., 1 Main St, Springfield. Do we already know them?",
+  outcome:"Avoided a duplicate account and linked the lead to the right customer, with every decision explained.",
+  html:()=>shell("Match","3 candidates",
+   `<div style="color:var(--muted);font-size:13px;margin-bottom:6px">Incoming lead · <b style="color:var(--ink)">ACME Corp., 1 Main St, Springfield</b></div>`
+   +tbl(["Candidate","Reasons","Score",""],[["<b>Acme Corporation</b><br>"+muted("SAP · customer · $2.4M open orders"),c("Name fuzzy","br")+" "+c("Tax ID exact","br"),"<b style='color:#1f7a3f'>96%</b>",c("Auto-match","ok")],["<b>ACME Corp</b><br>"+muted("Salesforce · account · owner Dana K."),c("Name exact","br")+" "+c("Address fuzzy","br"),"<b style='color:#1f7a3f'>92%</b>",btn("Match")],["<b>Acme Co. Holdings</b><br>"+muted("Oracle · supplier"),c("Different tax ID","br"),"<b style='color:#b42318'>71%</b>",btn("Not a match",1)]])
+   +`<div class="good"><b>After merge:</b> the lead links to golden record GR-10482 and routes to the existing owner, Dana K.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Merge into GR-10482")}</div>`,
    c("Explainable","br")+c("Human in the loop"))},
- "Stewardship inbox":{stage:"trust",what:"Tasks waiting for a data steward, prioritized, with one-click resolution.",html:()=>shell("Stewardship inbox","7 open",
-   tbl(["Task","Domain","Age",""],[["Possible duplicate · Globex Retail","Customer","2d",btn("Review")],["Missing tax ID · Northwind","Supplier","1d",btn("Review")],["Hierarchy change · EMEA","Customer","5h",btn("Review")],["Address could not be verified","Customer","3h",btn("Review")]]),
-   c("2 overdue","warn")+c("Assigned to you"))},
- "Hierarchy explorer":{stage:"trust",what:"Browse and edit customer or product hierarchies.",html:()=>shell("Hierarchy explorer","Acme Corporation",
-   `<div class="tree"><div>▾ <b>Acme Corporation</b> ${c("GR-10482","br")}</div><div class="n"><div>▾ Acme Americas</div><div class="n"><div>• Acme Industrial GmbH</div><div>• Acme Logistics US</div></div><div>▾ Acme EMEA</div><div class="n"><div>• Acme Retail UK</div><div>• Acme France SAS ${c("Moved","warn")}</div></div></div></div>
-   <div class="mrow" style="margin-top:10px">${btn("Save changes")}${btn("Discard",1)}</div>`,
-   c("Changes need steward approval","warn"))},
- "Policy decision":{stage:"trust",what:"Explains why access was allowed or blocked, and what to do next.",html:()=>shell("Policy decision","Sales-EMEA",
-   `<div class="mbox" style="background:#fdeceb;border-color:transparent;color:#1b2a3f"><b>Personal mobile numbers are blocked for your role.</b><div style="font-size:13px;margin-top:4px">Rule: PII.Contact is restricted for Sales Operations in EMEA.</div></div>
-   <div class="mrow" style="margin-top:12px">${btn("Use business number")}${btn("Request exception",1)}</div>`,
-   c("Blocked · personal data","bad")+c("Allowed · business contact","ok"))},
- "Audit explorer":{stage:"trust",what:"Every call, by person and agent, with its policy decision and lineage.",html:()=>shell("Audit explorer","Today",
-   `<div class="mrow" style="margin-bottom:8px">${c("All agents","br")}${c("Claude")}${c("Agentforce")}${c("Copilot")}</div>`
-   +[["09:02","Jordan · Claude","Connect",c("Allowed","ok")],["09:07","Jordan · Claude","Read SAP + Salesforce",c("Allowed · masked","ok")],["09:15","Jordan · Claude","Match and merge",c("Approved","ok")],["09:17","Jordan · Claude","Read personal mobile",c("Blocked","bad")],["09:20","Priya · Agentforce","Read data product",c("Allowed","ok")]].map(([t,w,a,s])=>`<div class="ev"><span class="t mono2">${t}</span><span style="flex:1"><b>${a}</b><br><span style="color:var(--muted);font-size:12.5px">${w}</span></span>${s}</div>`).join(""),
-   c("Every agent · one log","br")+c("Export for audit"))}
+ "Stewardship inbox":{persona:"Data steward",usecase:"Starting the day's stewardship work",prompt:"What needs my attention today?",
+  outcome:"Worked the tasks with the biggest business impact first, instead of the oldest.",
+  html:()=>shell("Stewardship inbox","7 open · sorted by impact",
+   tbl(["Task","Business impact","Due",""],[["Possible duplicate · Globex Retail","$1.1M open orders split across 2 accounts",c("Today","bad"),btn("Resolve")],["Missing tax ID · Northwind Logistics","Blocks invoicing in SAP",c("Today","bad"),btn("Resolve")],["Hierarchy change · Acme France","Moves $1.2M between regions",c("Tomorrow","warn"),btn("Review")],["Address unverified · 12 customers","Shipping labels at risk",c("Friday"),btn("Bulk fix",1)]]),
+   c("2 due today","bad")+c("Assigned to you"))},
+ "Hierarchy explorer":{persona:"Data steward",usecase:"Changing a customer hierarchy safely",prompt:"Move Acme France under Acme EMEA and show me the impact.",
+  outcome:"Made the change knowing exactly which revenue moves and which reports change.",
+  html:()=>shell("Hierarchy explorer","Acme Corporation",
+   `<div class="tree"><div>▾ <b>Acme Corporation</b> ${c("GR-10482","br")}</div><div class="n"><div>▾ Acme Americas</div><div class="n"><div>• Acme Industrial GmbH</div><div style="opacity:.45;text-decoration:line-through">• Acme France SAS</div></div><div>▾ Acme EMEA</div><div class="n"><div>• Acme Retail UK</div><div>• <b>Acme France SAS</b> ${c("Moved here","warn")}</div></div></div></div>
+   <div class="impact"><b>Impact:</b> $1.2M ARR moves from Americas to EMEA in 3 reports; 2 account owners change.</div>
+   <div class="mrow" style="margin-top:10px">${btn("Submit for approval")}${btn("Discard",1)}</div>`,
+   c("Effective next month","br"))},
+ "Policy decision":{persona:"Sales representative",usecase:"Asking for data the policy protects",prompt:"Get me the account owner's personal mobile number.",
+  outcome:"Got a clear reason and a useful alternative, instead of a dead end.",
+  html:()=>shell("Policy decision","Sales-EMEA",
+   `<div class="mbox" style="background:#fdeceb;border-color:transparent;color:#1b2a3f"><b>Personal mobile numbers are blocked for your role.</b><div style="font-size:13px;margin-top:4px">Rule PII.Contact · Sales Operations · EMEA (GDPR)</div></div>
+   <div class="good"><b>You can use:</b> business phone +49 89 5550 1200 · business email d•••@acme.com</div>
+   <div class="mrow" style="margin-top:10px">${btn("Use business contact")}${btn("Request exception with reason",1)}</div>`,
+   c("Decision logged","br"))},
+ "Audit explorer":{persona:"Compliance officer",usecase:"Evidence for a privacy audit",prompt:"Show all agent access to customer PII this week.",
+  outcome:"Produced audit evidence in minutes: who, which agent, what data, and what the policy decided.",
+  html:()=>shell("Audit explorer","Customer PII · this week",
+   `<div class="mg m4" style="margin-bottom:10px">${kpi("PII requests","1,284")}${kpi("Allowed · masked","1,241")}${kpi("Blocked","43")}${kpi("Exceptions","2")}</div>`
+   +[["Mon 09:17","Jordan L. · Claude","Read personal mobile",c("Blocked","bad")],["Tue 11:02","Priya S. · Agentforce","Read DIM_CUSTOMER.email",c("Allowed · masked","ok")],["Wed 15:40","Marco R. · Copilot","Export 5k contacts",c("Blocked","bad")]].map(([t,w,a,s])=>`<div class="ev"><span class="t mono2" style="width:74px">${t}</span><span style="flex:1"><b>${a}</b><br>${muted(w)}</span>${s}</div>`).join("")
+   +`<div class="mrow" style="margin-top:10px">${btn("Export evidence (GDPR)")}${btn("Filter by agent",1)}</div>`,
+   c("Every agent · one log","br"))}
 };
 const APPORDER=[];
 STAGES.forEach(st=>st.tools.forEach(t=>{ if(t[3]) APPORDER.push({name:t[3],op:t[0],rel:t[2],stage:st.name}); }));
 const viewer=document.getElementById("viewer");
 let vi=0, lastFocus=null;
+const REL={r1:"Release 1",r2:"Release 2",r3:"Release 3"};
 function showApp(i){
   vi=(i+APPORDER.length)%APPORDER.length;
-  const a=APPORDER[vi], v=APPV[a.name];
+  const a=APPORDER[vi], v=APPV[a.name]||{};
   document.getElementById("vtitle").textContent=a.name;
-  document.getElementById("vsub").textContent=`${a.stage} · ${a.op} · ${LABEL[a.rel]==="R1"?"Release 1":LABEL[a.rel]==="R2"?"Release 2":"Release 3"} — ${v?v.what:""}`;
-  document.getElementById("vbody").innerHTML=v?v.html():"";
+  document.getElementById("vsub").textContent=`${a.stage} · ${a.op} · ${REL[a.rel]||""}`;
+  document.getElementById("vbody").innerHTML=
+    `<div class="vctx"><div class="persona"><span class="pchip">${v.persona||""}</span><span>${v.usecase||""}</span></div>
+     <div class="ask"><small>Asked in Claude</small>${v.prompt||""}</div></div>`
+    +(v.html?v.html():"")
+    +(v.outcome?`<p class="outcome"><b>Outcome:</b> ${v.outcome}</p>`:"");
   document.getElementById("vcount").textContent=`${vi+1} of ${APPORDER.length}`;
 }
 function openApp(name){ lastFocus=document.activeElement; showApp(Math.max(0,APPORDER.findIndex(a=>a.name===name))); viewer.showModal(); }
