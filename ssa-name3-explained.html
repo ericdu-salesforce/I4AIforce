@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SSA-NAME3 · the matching engine inside Informatica MDM</title>
+<style>
+:root{
+  --page:#f4f6f9; --surface:#ffffff; --surface2:#f7f9fb; --ink:#14202e; --ink2:#3e4a5c; --muted:#66768a; --line:#dde3ea;
+  --navy:#032d60; --blue:#0176d3; --tint:#eaf5fe; --blue-line:#bcd8f3;
+  --ok:#1f7a3f; --ok-soft:#e6f4eb; --warn:#9a5b00; --warn-soft:#fdf1dc; --bad:#b42318; --bad-soft:#fdeceb;
+  --shadow:0 1px 2px rgba(20,32,46,.05),0 8px 26px rgba(20,32,46,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0f141a; --surface:#171d25; --surface2:#1d2530; --ink:#e9edf2; --ink2:#c3ccd6; --muted:#8f9bab; --line:#2a3440;
+    --navy:#d9e8f8; --blue:#5aa8f0; --tint:#16304c; --blue-line:#2d5680;
+    --ok:#62c98a; --ok-soft:#14301f; --warn:#f0b25c; --warn-soft:#3a2a12; --bad:#f28b82; --bad-soft:#3a1a18;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0f141a; --surface:#171d25; --surface2:#1d2530; --ink:#e9edf2; --ink2:#c3ccd6; --muted:#8f9bab; --line:#2a3440;
+  --navy:#d9e8f8; --blue:#5aa8f0; --tint:#16304c; --blue-line:#2d5680;
+  --ok:#62c98a; --ok-soft:#14301f; --warn:#f0b25c; --warn-soft:#3a2a12; --bad:#f28b82; --bad-soft:#3a1a18;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.3);
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.wrap{max-width:1120px;margin:0 auto;padding:36px 24px 72px}
+.kicker{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700;margin:0 0 10px}
+h1{font-size:clamp(30px,4.6vw,50px);line-height:1.06;letter-spacing:-.02em;margin:0 0 14px;color:var(--navy);max-width:20ch}
+.lede{font-size:18px;color:var(--ink2);max-width:66ch;margin:0}
+section{padding-top:46px}
+h2{font-size:24px;margin:0 0 6px;color:var(--navy)}
+.sub{color:var(--muted);margin:0 0 18px;max-width:72ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:26px}
+.stat{padding:16px 18px}
+.stat b{display:block;font-size:30px;line-height:1.1;color:var(--navy)}
+.stat span{font-size:13.5px;color:var(--muted)}
+/* variation */
+.variants{display:flex;flex-wrap:wrap;gap:10px}
+.var{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:15px}
+.var small{display:block;font-size:12px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 14px;cursor:pointer;font:600 14px system-ui,sans-serif;color:var(--ink)}
+.btn:hover{border-color:var(--ink2)}
+.btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn:focus-visible,.seg button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.verdict{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:15px}
+.v-bad{background:var(--bad-soft);color:var(--bad)} .v-ok{background:var(--ok-soft);color:var(--ok)}
+/* pipeline */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.step{all:unset;cursor:pointer;display:block;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left}
+.step b{display:block;font-size:14px;color:var(--navy)}
+.step span{font-size:12.5px;color:var(--muted)}
+.step[aria-current="step"]{border-color:var(--blue);background:var(--tint)}
+.step:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.panel{padding:22px 24px;min-height:320px}
+.panel h3{margin:0 0 4px;font-size:19px;color:var(--navy)}
+.panel p.expl{color:var(--ink2);margin:0 0 16px;max-width:70ch}
+.tag{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface2)}
+.tag.k{background:var(--tint);border-color:var(--blue-line);color:var(--blue)}
+.arrow{color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--surface2);flex-wrap:wrap}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.funnel{display:flex;flex-direction:column;gap:6px;margin:14px 0}
+.fb{height:34px;border-radius:8px;background:var(--tint);border:1px solid var(--blue-line);display:flex;align-items:center;padding:0 12px;font-size:14px;color:var(--ink);transition:width .35s}
+.meter{display:grid;grid-template-columns:130px 1fr 60px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.bar{height:10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);transition:width .35s}
+.cand{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.cand:last-child{border-bottom:0}
+.cand b{font-size:15px}
+.cand small{display:block;color:var(--muted);font-size:13px}
+.score{font-size:22px;font-weight:700;min-width:44px;text-align:right}
+.pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-rv{background:var(--warn-soft);color:var(--warn)} .p-no{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.nav span{font-size:13px;color:var(--muted)}
+/* knobs */
+.knobs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.knob{padding:16px 18px}
+.knob h3{margin:0 0 2px;font-size:16px;color:var(--navy)}
+.knob .q{font-size:13px;color:var(--muted);margin:0 0 10px}
+.opt{display:flex;justify-content:space-between;gap:8px;font-size:14px;padding:5px 0;border-top:1px dashed var(--line)}
+.opt:first-of-type{border-top:0}
+.opt em{font-style:normal;color:var(--muted);font-size:12.5px;text-align:right}
+.def{color:var(--blue);font-weight:600}
+/* populations */
+.pops{display:flex;flex-wrap:wrap;gap:8px}
+.pop{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14px}
+.pop.hl{background:var(--tint);border-color:var(--blue-line);color:var(--blue);font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.two .card{padding:18px 20px}
+.two h3{margin:0 0 8px;font-size:17px;color:var(--navy)}
+.two ul{margin:0;padding-left:18px;color:var(--ink2);font-size:15px}
+.two li{margin:5px 0}
+/* architecture */
+.arch{display:grid;grid-template-columns:1fr 60px 1.3fr 60px 1fr;align-items:center;gap:0}
+.box{padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:center}
+.box b{display:block;color:var(--navy)}
+.box span{font-size:13px;color:var(--muted)}
+.box.core{background:var(--navy);border-color:transparent}
+.box.core b{color:#fff}.box.core span{color:#b9cde4}
+:root[data-theme="dark"] .box.core{background:#0b6bcb}
+.harrow{text-align:center;color:var(--blue);font-size:22px}
+.stack{display:flex;flex-direction:column;gap:8px}
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.te{padding:14px;border-top:4px solid var(--blue);background:var(--surface);border-radius:0 0 12px 12px;border-left:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.te b{display:block;font-size:20px;color:var(--navy)}
+.te span{font-size:13.5px;color:var(--ink2)}
+.te.next{border-top-color:var(--ok)}
+/* compare */
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{font-weight:600;color:var(--navy);width:24%}
+.tablewrap{overflow-x:auto}
+footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+footer a{color:var(--blue)}
+@media (max-width:900px){
+  .stats,.knobs{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tl{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .arch{grid-template-columns:1fr}
+  .harrow{transform:rotate(90deg);padding:4px 0}
+}
+@media (max-width:620px){
+  .stats,.knobs,.two,.tl{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .meter{grid-template-columns:100px 1fr 44px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Informatica MDM · under the hood</p>
+  <h1>SSA-NAME3: the matching engine inside Informatica MDM</h1>
+  <p class="lede">How Informatica finds the same person, company or address across millions of records — despite typos, nicknames, reordered words and different alphabets.</p>
+  <div class="stats">
+    <div class="card stat"><b>1986</b><span>built from government name-matching projects</span></div>
+    <div class="card stat"><b>60+</b><span>country and language rule sets</span></div>
+    <div class="card stat"><b>4 · 3</b><span>search levels · match levels</span></div>
+    <div class="card stat"><b>1 engine</b><span>inside MDM, Identity Resolution and Data Clustering</span></div>
+  </div>
+
+  <section>
+    <h2>The problem it solves</h2>
+    <p class="sub">The same customer rarely looks the same twice. Exact matching treats every variation below as a different person.</p>
+    <div class="variants" id="variants"></div>
+    <div class="row" style="margin-top:14px"><button class="btn" id="exactBtn">Match exactly</button><button class="btn" id="fuzzyBtn">Match with SSA-NAME3</button></div>
+    <div class="verdict v-bad" id="verdict">Pick a method to compare.</div>
+  </section>
+
+  <section>
+    <h2>How it works, step by step</h2>
+    <p class="sub">Follow one incoming record — <span class="mono">Jon Smyth · 12 Main St · Springfield</span> — through the engine. Steps 3, 4 and 5 have controls to try.</p>
+    <div class="steps" id="steps"></div>
+    <div class="card panel" id="panel" aria-live="polite"></div>
+    <div class="nav"><button class="btn" id="prev">← Previous</button><span id="pos"></span><button class="btn" id="next">Next →</button></div>
+  </section>
+
+  <section>
+    <h2>The four settings that shape every match</h2>
+    <p class="sub">Each application chooses how much to trade speed for completeness, and precision for recall. Defaults in blue.</p>
+    <div class="knobs">
+      <div class="card knob"><h3>Key level</h3><p class="q">How many keys to build per name</p>
+        <div class="opt"><span>Limited</span><em>least disk, less reliable</em></div>
+        <div class="opt"><span class="def">Standard</span><em>recommended</em></div>
+        <div class="opt"><span>Extended</span><em>high-risk searches</em></div></div>
+      <div class="card knob"><h3>Search level</h3><p class="q">How widely to look for candidates</p>
+        <div class="opt"><span>Narrow</span><em>fastest</em></div>
+        <div class="opt"><span class="def">Typical</span><em>most rule sets</em></div>
+        <div class="opt"><span>Exhaustive</span><em>more variation</em></div>
+        <div class="opt"><span>Extreme</span><em>every possibility</em></div></div>
+      <div class="card knob"><h3>Match purpose</h3><p class="q">What kind of entity you're matching</p>
+        <div class="opt"><span>Person name · Individual</span><em>people</em></div>
+        <div class="opt"><span>Household · Resident</span><em>shared address</em></div>
+        <div class="opt"><span>Organization · Division</span><em>companies</em></div>
+        <div class="opt"><span>Contact · Address</span><em>people at places</em></div></div>
+      <div class="card knob"><h3>Match level</h3><p class="q">How strict the final decision is</p>
+        <div class="opt"><span>Conservative</span><em>avoids wrong merges</em></div>
+        <div class="opt"><span class="def">Typical</span><em>reasonable matches</em></div>
+        <div class="opt"><span>Loose</span><em>avoids missed matches</em></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Populations: matching that knows the culture</h2>
+    <p class="sub">Each population is a rule set for one country, language or region: its nicknames, spelling habits, name order and scripts. Informatica can also build custom populations. Examples below; the product installer shows the current list.</p>
+    <div class="pops" id="pops"></div>
+    <div class="two" style="margin-top:14px">
+      <div class="card"><h3>Across scripts</h3><ul><li>Roman ↔ local script, as in Greece or Israel</li><li>Chinese, Japanese and Korean, including Katakana with Roman</li><li>Bidirectional Arabic and Latin</li></ul></div>
+      <div class="card"><h3>Mixed data</h3><ul><li>One system can serve many countries</li><li>Searches in one language against a database built on international rules</li><li>Custom populations for unusual requirements</li></ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Where it sits in Informatica</h2>
+    <p class="sub">SSA-NAME3 finds and scores matches. The products around it decide what to do with them.</p>
+    <div class="arch">
+      <div class="stack"><div class="box"><b>Source records</b><span>SAP, Salesforce, Oracle, files</span></div><div class="box"><b>Agents</b><span>"Is this the same customer?"</span></div></div>
+      <div class="harrow" aria-hidden="true">→</div>
+      <div class="box core"><b>SSA-NAME3</b><span>populations · keys · search · scoring</span></div>
+      <div class="harrow" aria-hidden="true">→</div>
+      <div class="stack"><div class="box"><b>Informatica MDM</b><span>survivorship, golden records, stewardship</span></div><div class="box"><b>Matching as a Service</b><span>the same engine, one API call</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Forty years of history</h2>
+    <p class="sub">An empirical engine, refined across hundreds of production systems.</p>
+    <div class="tl">
+      <div class="te"><b>1986</b><span>Search Software America (SSA) ships SSA-NAME3</span></div>
+      <div class="te"><b>Late 1990s</b><span>Becomes the core of Data Clustering Engine and Identity Resolution</span></div>
+      <div class="te"><b>2005</b><span>Company renamed Identity Systems</span></div>
+      <div class="te"><b>2006</b><span>Part of Nokia, via Intellisync</span></div>
+      <div class="te"><b>2008</b><span>Informatica acquires Identity Systems (~$85M)</span></div>
+      <div class="te next"><b>Next</b><span>Matching as a Service for agents</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Where it fits with AI decision models</h2>
+    <p class="sub">Fast decision models, such as OpenAI's new Decisions API, are strong at judging one pair. SSA-NAME3 is strong at everything around that judgment.</p>
+    <div class="card tablewrap">
+      <table>
+        <thead><tr><th></th><th>SSA-NAME3</th><th>Decision model</th></tr></thead>
+        <tbody>
+          <tr><td>Find candidates in millions of records</td><td>Yes — keys and search ranges</td><td>No — needs candidates supplied</td></tr>
+          <tr><td>Names across 60+ cultures and scripts</td><td>Built in, tested for decades</td><td>General knowledge, untested per population</td></tr>
+          <tr><td>Same answer every time</td><td>Deterministic</td><td>Probabilistic</td></tr>
+          <tr><td>Hard gray-zone judgments</td><td>Routes to a steward</td><td>Strong — a calibrated second opinion</td></tr>
+          <tr><td>Cost per million pairs</td><td>Low</td><td>High</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sub" style="margin-top:12px">Best together: SSA-NAME3 finds and scores candidates; a decision model adjudicates only the gray zone; MDM keeps the golden record and the audit trail.</p>
+  </section>
+
+  <footer>Sources: Informatica documentation for SSA-NAME3 and Identity Resolution (overview, populations, key levels, search levels, match purposes, match levels, product history); Nokia and Informatica acquisition announcements, 2008. Search keys and scores in the walkthrough are illustrative.</footer>
+</div>
+<script>
+/* ---- variation demo ---- */
+const VARS=[["Jonathan Smith","CRM"],["Jon Smyth","web form"],["SMITH, JONATHAN","SAP"],["J. Smith","invoice"],["Jonathon Smithe","call center"],["Jonathan Smith Jr.","contract"]];
+const vEl=document.getElementById("variants");
+vEl.innerHTML=VARS.map(([n,s])=>`<div class="var">${n}<small>${s}</small></div>`).join("");
+const verdict=document.getElementById("verdict");
+document.getElementById("exactBtn").onclick=e=>{setBtn(e.target);verdict.className="verdict v-bad";verdict.textContent="Exact match: 6 different customers. Duplicates, split order history, and agents acting on the wrong record.";};
+document.getElementById("fuzzyBtn").onclick=e=>{setBtn(e.target);verdict.className="verdict v-ok";verdict.textContent="SSA-NAME3: 1 customer. Nicknames, spelling, word order and suffixes are understood, so all six resolve to one person.";};
+function setBtn(b){document.querySelectorAll("#exactBtn,#fuzzyBtn").forEach(x=>x.classList.toggle("on",x===b));}
+
+/* ---- populations ---- */
+const POPS=["USA","United Kingdom","Canada","Australia","Germany","France","Spain","Italy","Netherlands","Brazil","Mexico","India","China","Japan","Korea","Arabic mixed","Greece","Israel","South Africa","and many more"];
+document.getElementById("pops").innerHTML=POPS.map((p,i)=>`<span class="pop${[0,13,15].includes(i)?" hl":""}">${p}</span>`).join("");
+
+/* ---- pipeline ---- */
+const CANDS=[["Jonathan Smith","12 Main Street, Springfield",94],["J. Smits","12 Main St, Springfield",78],["John Smithe","120 Maine Ave, Springfield",61]];
+const SEARCH={Narrow:[1,"fastest"],Typical:[3,"balanced"],Exhaustive:[7,"more variation"],Extreme:[15,"every possibility"]};
+let searchLvl="Typical", purpose="Person name", matchLvl=1;
+const PURP={"Person name":[["Name",90],["Address",30],["Date of birth",40],["ID numbers",60]],"Household":[["Family name",70],["Address",95],["First name",20],["ID numbers",20]],"Organization":[["Company name",95],["Address",40],["Tax ID",70],["Industry",15]]};
+const ML=[["Conservative",90,80],["Typical",85,70],["Loose",75,60]];
+const STEPS=[
+ {t:"Population",s:"Load local rules",h:()=>`<h3>1 · Pick the population</h3><p class="expl">The engine loads the rules for the data's country and language — here, the USA population, which knows that Jon is short for Jonathan and that Smyth and Smith are common variants.</p>
+   <div class="row"><span class="tag">Jon Smyth · 12 Main St · Springfield</span><span class="arrow">→</span><span class="tag k">Population: USA</span></div>
+   <div class="row" style="margin-top:14px"><span class="tag">Jon ≈ Jonathan</span><span class="tag">Smyth ≈ Smith</span><span class="tag">St = Street</span><span class="tag">Word order flexible</span></div>`},
+ {t:"Keys",s:"Build fuzzy keys",h:()=>`<h3>2 · Build several fuzzy keys</h3><p class="expl">The name becomes a handful of keys designed to stay the same across typos and variants. Every record in the database is indexed on keys like these, so similar names land next to each other.</p>
+   <div class="row"><span class="tag">JON SMYTH</span><span class="arrow">→</span><span class="tag k">SMT·JN</span><span class="tag k">SMT·J</span><span class="tag k">SMT</span></div>
+   <div class="row" style="margin-top:10px"><span class="tag">JONATHAN SMITH</span><span class="arrow">→</span><span class="tag k">SMT·JN</span><span class="tag k">SMT·J</span><span class="tag k">SMT</span></div>
+   <p class="expl" style="margin-top:14px;font-size:14px;color:var(--muted)">Same keys, different spellings. Keys shown are illustrative.</p>`},
+ {t:"Search",s:"Find candidates",h:()=>{const[n,d]=SEARCH[searchLvl];return `<h3>3 · Search: millions in, a handful out</h3><p class="expl">Keys define search ranges, so only nearby records come back. The search level sets how wide to look — wider finds more variation but returns more candidates to check.</p>
+   <div class="seg" role="group" aria-label="Search level">${Object.keys(SEARCH).map(k=>`<button data-s="${k}" aria-pressed="${k===searchLvl}">${k}</button>`).join("")}</div>
+   <div class="funnel"><div class="fb" style="width:100%">10,000,000 records in the database</div><div class="fb" style="width:${Math.min(40+n*3,90)}%">${(n*140).toLocaleString()} records share a key range</div><div class="fb" style="width:${Math.min(12+n*3,60)}%"><b>${n} candidate${n>1?"s":""}</b>&nbsp;to score · ${d}</div></div>`}},
+ {t:"Score",s:"Compare fields",h:()=>`<h3>4 · Score each candidate</h3><p class="expl">A match purpose decides which fields matter for this kind of entity. Switch purposes to see how the weighting changes.</p>
+   <div class="seg" role="group" aria-label="Match purpose">${Object.keys(PURP).map(k=>`<button data-p="${k}" aria-pressed="${k===purpose}">${k}</button>`).join("")}</div>
+   <div style="margin-top:14px">${PURP[purpose].map(([f,w])=>`<div class="meter"><span>${f}</span><div class="bar"><i style="width:${w}%"></i></div><span class="mono">${w}</span></div>`).join("")}</div>
+   <div style="margin-top:10px">${CANDS.map(c=>`<div class="cand"><span><b>${c[0]}</b><small>${c[1]}</small></span><span class="score">${c[2]}</span></div>`).join("")}</div>`},
+ {t:"Decide",s:"Match, review, or not",h:()=>{const[name,a,r]=ML[matchLvl];return `<h3>5 · Decide</h3><p class="expl">The match level sets the thresholds. Clear matches merge automatically, the gray zone goes to a data steward, and the rest stay separate. Drag the slider.</p>
+   <div class="row"><span>Match level</span><input type="range" min="0" max="2" step="1" value="${matchLvl}" id="ml" aria-label="Match level" style="width:220px"><b>${name}</b><span style="color:var(--muted);font-size:13px">match ≥ ${a} · review ≥ ${r}</span></div>
+   <div style="margin-top:10px">${CANDS.map(c=>{const d=c[2]>=a?["Match","p-ok"]:c[2]>=r?["Review","p-rv"]:["No match","p-no"];return `<div class="cand"><span><b>${c[0]}</b><small>score ${c[2]}</small></span><span class="pill ${d[1]}">${d[0]}</span></div>`}).join("")}</div>`}}
+];
+const stepsEl=document.getElementById("steps"), panel=document.getElementById("panel");
+STEPS.forEach((s,i)=>{const b=document.createElement("button");b.className="step";b.innerHTML=`<b>${i+1}. ${s.t}</b><span>${s.s}</span>`;b.onclick=()=>go(i);stepsEl.appendChild(b);});
+let cur=0;
+function go(i){
+  cur=(i+STEPS.length)%STEPS.length;
+  panel.innerHTML=STEPS[cur].h();
+  [...stepsEl.children].forEach((b,n)=>{b.removeAttribute("aria-current");if(n===cur)b.setAttribute("aria-current","step");});
+  document.getElementById("pos").textContent=`Step ${cur+1} of ${STEPS.length}`;
+  panel.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{searchLvl=b.dataset.s;go(cur);});
+  panel.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{purpose=b.dataset.p;go(cur);});
+  const ml=document.getElementById("ml"); if(ml) ml.oninput=e=>{matchLvl=+e.target.value;go(cur);document.getElementById("ml").focus();};
+}
+document.getElementById("prev").onclick=()=>go(cur-1);
+document.getElementById("next").onclick=()=>go(cur+1);
+go(0);
+</script>
+</body>
+</html>
