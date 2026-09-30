@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SSA-NAME3 · the matching engine inside Informatica MDM</title>
+<title>SSA-NAME3, explained · the foundation of Matching as a Service</title>
 <style>
 :root{
   --page:#f4f6f9; --surface:#ffffff; --surface2:#f7f9fb; --ink:#14202e; --ink2:#3e4a5c; --muted:#66768a; --line:#dde3ea;
@@ -52,6 +52,7 @@ h2{font-size:24px;margin:0 0 6px;color:var(--navy)}
 .btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .btn:focus-visible,.seg button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .verdict{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:15px}
+.v-neutral{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
 .v-bad{background:var(--bad-soft);color:var(--bad)} .v-ok{background:var(--ok-soft);color:var(--ok)}
 /* pipeline */
 .steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:12px}
@@ -137,161 +138,249 @@ footer a{color:var(--blue)}
   .steps{grid-template-columns:1fr 1fr}
   .meter{grid-template-columns:100px 1fr 44px}
 }
+/* key deep dive */
+.pipe{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.ps{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.ps b{font-size:14px;color:var(--navy)}
+.ps .ex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;color:var(--ink);word-break:break-word}
+.ps span{font-size:12.5px;color:var(--muted)}
+.ps.key{background:var(--tint);border-color:var(--blue-line)}
+.why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.why .card{padding:16px 18px}
+.why h3{margin:0 0 6px;font-size:16px;color:var(--navy)}
+.why p{margin:0;font-size:14.5px;color:var(--ink2)}
+.keymatch{padding:18px 20px;margin-top:14px}
+.krow{display:grid;grid-template-columns:230px 1fr;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.krow:last-child{border-bottom:0}
+.kname{font-size:15px}
+.kname small{display:block;font-size:12.5px;color:var(--muted)}
+.kk{display:flex;flex-wrap:wrap;gap:6px}
+.kk .tag.hit{background:var(--ok-soft);border-color:transparent;color:var(--ok);font-weight:600}
+.layers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.layer{padding:16px 18px;border-top:4px solid var(--blue);border-radius:0 0 12px 12px}
+.layer h3{margin:0 0 4px;font-size:16px;color:var(--navy)}
+.layer .who{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.layer p{margin:0;font-size:14.5px;color:var(--ink2)}
+.files{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+@media (max-width:900px){.pipe{grid-template-columns:repeat(3,minmax(0,1fr))}.why,.layers{grid-template-columns:1fr}.krow{grid-template-columns:1fr}}
+@media (max-width:620px){.pipe{grid-template-columns:1fr 1fr}}
+
+.minute{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:26px}
+.mcard{padding:18px 20px;position:relative}
+.mcard .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:14px}
+.mcard h3{margin:8px 0 4px;font-size:18px;color:var(--navy)}
+.mcard p{margin:0;font-size:15px;color:var(--ink2)}
+.chapters{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chapters a{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);text-decoration:none;font-size:14px;font-weight:600}
+.chapters a:hover{border-color:var(--blue);color:var(--blue)}
+.ch{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 4px}
+.hint{font-size:13px;color:var(--muted)}
+.h3{margin:28px 0 10px;font-size:18px;color:var(--navy)}
+.graybox{padding:20px 22px}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink)}
+.switch input{width:18px;height:18px;accent-color:var(--blue)}
+.scale{position:relative;display:flex;height:34px;margin:18px 0 30px;border-radius:8px;overflow:visible}
+.zone{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600}
+.zone span{white-space:nowrap}
+.z-no{background:var(--surface2);color:var(--muted);border-radius:8px 0 0 8px;border:1px solid var(--line)}
+.z-gray{background:var(--warn-soft);color:var(--warn)}
+.z-yes{background:var(--ok-soft);color:var(--ok);border-radius:0 8px 8px 0}
+#dots{position:absolute;left:0;right:0;top:36px;height:24px}
+.dot{position:absolute;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
+:root[data-theme="dark"] .dot{background:#0b6bcb}
+.grow{display:grid;grid-template-columns:28px 210px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.gid{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
+.gname b{font-size:15px}.gname small{display:block;font-size:12.5px;color:var(--muted)}
+.gnote{font-size:13.5px;color:var(--ink2)}
+.result{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--tint);font-size:14.5px;color:var(--ink)}
+.arch2{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lane{display:flex;justify-content:center;gap:12px;width:100%;max-width:760px}
+.lane.two2 .ab,.lane.three .ab{flex:1}
+.ab{flex:0 1 420px;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:center}
+.ab b{display:block;color:var(--navy);font-size:15px}
+.ab span{font-size:13px;color:var(--muted)}
+.ab.svc{background:var(--tint);border-color:var(--blue-line)}
+.ab.eng{background:#032d60;border-color:transparent}.ab.eng b{color:#fff}.ab.eng span{color:#b9cde4}
+:root[data-theme="dark"] .ab.eng{background:#0b6bcb}
+.ab.ext{background:var(--surface2)}
+.ab.opt2{border-style:dashed;background:transparent}
+.down{color:var(--blue);font-size:18px;line-height:1}
+.rules{margin:0;padding-left:22px;color:var(--ink2);font-size:15px}
+.rules li{margin:6px 0}
+.rules b{color:var(--ink)}
+.tl3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+@media (max-width:900px){.minute,.tl3{grid-template-columns:1fr}.grow{grid-template-columns:28px 1fr auto}.gnote{grid-column:2 / -1}.lane.three{flex-direction:column}.lane.two2{flex-direction:column}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <p class="kicker">Informatica MDM · under the hood</p>
-  <h1>SSA-NAME3: the matching engine inside Informatica MDM</h1>
-  <p class="lede">How Informatica finds the same person, company or address across millions of records — despite typos, nicknames, reordered words and different alphabets.</p>
-  <div class="stats">
-    <div class="card stat"><b>1986</b><span>built from government name-matching projects</span></div>
-    <div class="card stat"><b>60+</b><span>country and language rule sets</span></div>
-    <div class="card stat"><b>4 · 3</b><span>search levels · match levels</span></div>
-    <div class="card stat"><b>1 engine</b><span>inside MDM, Identity Resolution and Data Clustering</span></div>
+  <p class="kicker">Informatica · Matching as a Service</p>
+  <h1>SSA-NAME3, explained</h1>
+  <p class="lede">The engine that recognizes the same person or company across millions of messy records — and the foundation of Matching as a Service.</p>
+
+  <div class="minute">
+    <div class="card mcard"><span class="num">1</span><h3>Find</h3><p>Every name becomes a few short fuzzy keys, so similar names find each other among millions of records in milliseconds.</p></div>
+    <div class="card mcard"><span class="num">2</span><h3>Score</h3><p>Candidates are compared with rules tuned for 60+ countries and languages, and every score can be explained.</p></div>
+    <div class="card mcard"><span class="num">3</span><h3>Decide</h3><p>Clear matches merge, clear non-matches don't — and a decision model helps with the gray zone in between.</p></div>
   </div>
 
-  <section>
-    <h2>The problem it solves</h2>
-    <p class="sub">The same customer rarely looks the same twice. Exact matching treats every variation below as a different person.</p>
+  <nav class="chapters" aria-label="Chapters">
+    <a href="#problem">1 · The problem</a><a href="#how">2 · How it works</a><a href="#keys">3 · The secret: keys</a><a href="#rules">4 · Rules by country</a><a href="#service">5 · Matching as a Service</a><a href="#moat">6 · Why it's hard to copy</a>
+  </nav>
+
+  <section id="problem">
+    <p class="ch">Chapter 1</p>
+    <h2>The problem: one customer, many spellings</h2>
+    <p class="sub">Every system spells the same customer a little differently. Exact matching sees six strangers.</p>
     <div class="variants" id="variants"></div>
     <div class="row" style="margin-top:14px"><button class="btn" id="exactBtn">Match exactly</button><button class="btn" id="fuzzyBtn">Match with SSA-NAME3</button></div>
-    <div class="verdict v-bad" id="verdict">Pick a method to compare.</div>
+    <div class="verdict v-neutral" id="verdict">Pick a method to compare.</div>
   </section>
 
-  <section>
-    <h2>How it works, step by step</h2>
-    <p class="sub">Follow one incoming record — <span class="mono">Jon Smyth · 12 Main St · Springfield</span> — through the engine. Steps 3, 4 and 5 have controls to try.</p>
+  <section id="how">
+    <p class="ch">Chapter 2</p>
+    <h2>How it works, in five steps</h2>
+    <p class="sub">Follow one new record — <span class="mono">Jon Smyth · 12 Main St · Springfield</span> — through the engine. Steps 3 to 5 have controls to try.</p>
     <div class="steps" id="steps"></div>
     <div class="card panel" id="panel" aria-live="polite"></div>
     <div class="nav"><button class="btn" id="prev">← Previous</button><span id="pos"></span><button class="btn" id="next">Next →</button></div>
   </section>
 
-  <section>
-    <h2>The four settings that shape every match</h2>
-    <p class="sub">Each application chooses how much to trade speed for completeness, and precision for recall. Defaults in blue.</p>
-    <div class="knobs">
-      <div class="card knob"><h3>Key level</h3><p class="q">How many keys to build per name</p>
-        <div class="opt"><span>Limited</span><em>least disk, less reliable</em></div>
-        <div class="opt"><span class="def">Standard</span><em>recommended</em></div>
-        <div class="opt"><span>Extended</span><em>high-risk searches</em></div></div>
-      <div class="card knob"><h3>Search level</h3><p class="q">How widely to look for candidates</p>
-        <div class="opt"><span>Narrow</span><em>fastest</em></div>
-        <div class="opt"><span class="def">Typical</span><em>most rule sets</em></div>
-        <div class="opt"><span>Exhaustive</span><em>more variation</em></div>
-        <div class="opt"><span>Extreme</span><em>every possibility</em></div></div>
-      <div class="card knob"><h3>Match purpose</h3><p class="q">What kind of entity you're matching</p>
-        <div class="opt"><span>Person name · Individual</span><em>people</em></div>
-        <div class="opt"><span>Household · Resident</span><em>shared address</em></div>
-        <div class="opt"><span>Organization · Division</span><em>companies</em></div>
-        <div class="opt"><span>Contact · Address</span><em>people at places</em></div></div>
-      <div class="card knob"><h3>Match level</h3><p class="q">How strict the final decision is</p>
-        <div class="opt"><span>Conservative</span><em>avoids wrong merges</em></div>
-        <div class="opt"><span class="def">Typical</span><em>reasonable matches</em></div>
-        <div class="opt"><span>Loose</span><em>avoids missed matches</em></div></div>
+  <section id="keys">
+    <p class="ch">Chapter 3</p>
+    <h2>The secret: how names become keys</h2>
+    <p class="sub">Before any matching, each name is turned into several short search keys. Different spellings of the same name end up with the same keys. Values shown are illustrative.</p>
+    <div class="pipe">
+      <div class="ps"><b>Raw input</b><div class="ex">Mr. Billy O'Neil-Smyth Jr.</div><span>As typed</span></div>
+      <div class="ps"><b>1 · Clean</b><div class="ex">MR BILLY ONEIL SMYTH JR</div><span>Case and punctuation</span></div>
+      <div class="ps"><b>2 · Apply rules</b><div class="ex">WILLIAM ONEIL SMYTH</div><span>Drop titles; Billy → William</span></div>
+      <div class="ps"><b>3 · Code sounds</b><div class="ex">WLM · ONL · SMT</div><span>Smyth and Smith become one</span></div>
+      <div class="ps"><b>4 · Weigh rarity</b><div class="ex">O'Neil rare · William common</div><span>Rare words lead</span></div>
+      <div class="ps key"><b>5 · Make keys</b><div class="ex">ONL+SMT · SMT+WLM · ONL+WLM</div><span>Several per name</span></div>
+    </div>
+    <div class="card keymatch">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px"><b style="color:var(--navy)">Try it: different spellings, shared keys</b><span class="hint">Select a record — shared keys turn green.</span></div>
+      <div id="krows"></div>
+    </div>
+    <div class="why">
+      <div class="card"><h3>Several keys per name</h3><p>Missing, extra or reordered words still share at least one key.</p></div>
+      <div class="card"><h3>Rare words lead</h3><p>Searches for common names don't drown in candidates.</p></div>
+      <div class="card"><h3>Tuned to your data</h3><p>Rules and word frequencies can be tuned from each customer's records.</p></div>
     </div>
   </section>
 
-  <section>
-    <h2>Populations: matching that knows the culture</h2>
-    <p class="sub">Each population is a rule set for one country, language or region: its nicknames, spelling habits, name order and scripts. Informatica can also build custom populations. Examples below; the product installer shows the current list.</p>
+  <section id="rules">
+    <p class="ch">Chapter 4</p>
+    <h2>Rules by country, settings by use case</h2>
+    <p class="sub">A population is a rule file for one country, language or region — its nicknames, spellings, word order and scripts. It's not code, a database or an AI model.</p>
     <div class="pops" id="pops"></div>
-    <div class="two" style="margin-top:14px">
-      <div class="card"><h3>Across scripts</h3><ul><li>Roman ↔ local script, as in Greece or Israel</li><li>Chinese, Japanese and Korean, including Katakana with Roman</li><li>Bidirectional Arabic and Latin</li></ul></div>
-      <div class="card"><h3>Mixed data</h3><ul><li>One system can serve many countries</li><li>Searches in one language against a database built on international rules</li><li>Custom populations for unusual requirements</li></ul></div>
+    <div class="layers">
+      <div class="card layer"><h3>Standard</h3><p class="who">Shipped by Informatica</p><p>60+ rule sets, one per country, language or region.</p></div>
+      <div class="card layer"><h3>Custom</h3><p class="who">Built for one customer</p><p>For unusual data, tuned from a sample of it.</p></div>
+      <div class="card layer"><h3>Local</h3><p class="who">Owned by the customer</p><p>Add nicknames, noise words and abbreviations — no IT needed.</p></div>
     </div>
+    <h3 class="h3">Four settings every application chooses</h3>
+    <div class="knobs">
+      <div class="card knob"><h3>Key level</h3><p class="q">How many keys</p><div class="opt"><span>Limited</span></div><div class="opt"><span class="def">Standard</span></div><div class="opt"><span>Extended</span></div></div>
+      <div class="card knob"><h3>Search level</h3><p class="q">How wide to look</p><div class="opt"><span>Narrow</span></div><div class="opt"><span class="def">Typical</span></div><div class="opt"><span>Exhaustive</span></div><div class="opt"><span>Extreme</span></div></div>
+      <div class="card knob"><h3>Match purpose</h3><p class="q">What you're matching</p><div class="opt"><span>People</span></div><div class="opt"><span>Households</span></div><div class="opt"><span>Organizations</span></div><div class="opt"><span>Contacts and addresses</span></div></div>
+      <div class="card knob"><h3>Match level</h3><p class="q">How strict to be</p><div class="opt"><span>Conservative</span></div><div class="opt"><span class="def">Typical</span></div><div class="opt"><span>Loose</span></div></div>
+    </div>
+    <p class="hint" style="margin-top:8px">Defaults in blue.</p>
   </section>
 
-  <section>
-    <h2>Where it sits in Informatica</h2>
-    <p class="sub">SSA-NAME3 finds and scores matches. The products around it decide what to do with them.</p>
-    <div class="arch">
-      <div class="stack"><div class="box"><b>Source records</b><span>SAP, Salesforce, Oracle, files</span></div><div class="box"><b>Agents</b><span>"Is this the same customer?"</span></div></div>
-      <div class="harrow" aria-hidden="true">→</div>
-      <div class="box core"><b>SSA-NAME3</b><span>populations · keys · search · scoring</span></div>
-      <div class="harrow" aria-hidden="true">→</div>
-      <div class="stack"><div class="box"><b>Informatica MDM</b><span>survivorship, golden records, stewardship</span></div><div class="box"><b>Matching as a Service</b><span>the same engine, one API call</span></div></div>
+  <section id="service">
+    <p class="ch">Chapter 5</p>
+    <h2>Matching as a Service: SSA-NAME3 plus a decision model</h2>
+    <p class="sub">A new offering built on SSA-NAME3, with a decision model for the hard cases — and no dependency on Informatica MDM.</p>
+
+    <div class="card graybox">
+      <div class="row" style="justify-content:space-between"><b style="color:var(--navy)">The gray zone, explained</b>
+        <label class="switch"><input type="checkbox" id="dmToggle"><span>Add a decision model</span></label></div>
+      <div class="scale" aria-hidden="true">
+        <div class="zone z-no" style="width:70%"><span>No match &lt; 70</span></div><div class="zone z-gray" style="width:15%"><span>Gray zone</span></div><div class="zone z-yes" style="width:15%"><span>Match ≥ 85</span></div>
+        <div id="dots"></div>
+      </div>
+      <div id="grows"></div>
+      <div class="result" id="gresult"></div>
     </div>
+
+    <h3 class="h3">How it fits together</h3>
+    <div class="arch2">
+      <div class="lane"><div class="ab ext">Agents and apps</div></div>
+      <div class="down" aria-hidden="true">↓</div>
+      <div class="lane"><div class="ab svc"><b>Match API and MCP tools</b><span>Match · resolve · explain · review</span></div></div>
+      <div class="down" aria-hidden="true">↓</div>
+      <div class="lane"><div class="ab svc"><b>Orchestrator</b><span>Thresholds, routing, budgets</span></div></div>
+      <div class="down" aria-hidden="true">↓</div>
+      <div class="lane two2"><div class="ab eng"><b>SSA-NAME3 core</b><span>Keys, search, scoring — every record</span></div><div class="ab eng"><b>Decision model</b><span>Gray zone only · pluggable</span></div></div>
+      <div class="down" aria-hidden="true">↓</div>
+      <div class="lane three"><div class="ab ext"><b>Connectivity</b><span>Data in</span></div><div class="ab svc"><b>Entity index</b><span>Keys, entity IDs, cross-refs</span></div><div class="ab svc"><b>Audit and evals</b><span>Every decision logged</span></div></div>
+      <div class="down" aria-hidden="true">⇣</div>
+      <div class="lane"><div class="ab opt2"><b>Informatica MDM · optional</b><span>Upgrade path, not a dependency</span></div></div>
+    </div>
+
   </section>
 
-  <section>
-    <h2>Forty years of history</h2>
-    <p class="sub">An empirical engine, refined across hundreds of production systems.</p>
+  <section id="moat">
+    <p class="ch">Chapter 6</p>
+    <h2>Why it's hard to copy</h2>
+    <div class="why">
+      <div class="card"><h3>Language-aware</h3><p>Rules for 60+ populations, not one algorithm for every language.</p></div>
+      <div class="card"><h3>Smart keys</h3><p>Several keys per name, shaped by how rare each word is.</p></div>
+      <div class="card"><h3>Forty years of edge cases</h3><p>Refined across hundreds of production systems since 1986.</p></div>
+    </div>
     <div class="tl">
-      <div class="te"><b>1986</b><span>Search Software America (SSA) ships SSA-NAME3</span></div>
-      <div class="te"><b>Late 1990s</b><span>Becomes the core of Data Clustering Engine and Identity Resolution</span></div>
-      <div class="te"><b>2005</b><span>Company renamed Identity Systems</span></div>
-      <div class="te"><b>2006</b><span>Part of Nokia, via Intellisync</span></div>
-      <div class="te"><b>2008</b><span>Informatica acquires Identity Systems (~$85M)</span></div>
-      <div class="te next"><b>Next</b><span>Matching as a Service for agents</span></div>
+      <div class="te"><b>1986</b><span>Search Software America ships SSA-NAME3</span></div>
+      <div class="te"><b>1990s</b><span>Core of two products beyond MDM</span></div>
+      <div class="te"><b>2005</b><span>Renamed Identity Systems</span></div>
+      <div class="te"><b>2006</b><span>Part of Nokia</span></div>
+      <div class="te"><b>2008</b><span>Acquired by Informatica</span></div>
+      <div class="te next"><b>Next</b><span>Matching as a Service</span></div>
     </div>
   </section>
 
-  <section>
-    <h2>Where it fits with AI decision models</h2>
-    <p class="sub">Fast decision models, such as OpenAI's new Decisions API, are strong at judging one pair. SSA-NAME3 is strong at everything around that judgment.</p>
-    <div class="card tablewrap">
-      <table>
-        <thead><tr><th></th><th>SSA-NAME3</th><th>Decision model</th></tr></thead>
-        <tbody>
-          <tr><td>Find candidates in millions of records</td><td>Yes — keys and search ranges</td><td>No — needs candidates supplied</td></tr>
-          <tr><td>Names across 60+ cultures and scripts</td><td>Built in, tested for decades</td><td>General knowledge, untested per population</td></tr>
-          <tr><td>Same answer every time</td><td>Deterministic</td><td>Probabilistic</td></tr>
-          <tr><td>Hard gray-zone judgments</td><td>Routes to a steward</td><td>Strong — a calibrated second opinion</td></tr>
-          <tr><td>Cost per million pairs</td><td>Low</td><td>High</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="sub" style="margin-top:12px">Best together: SSA-NAME3 finds and scores candidates; a decision model adjudicates only the gray zone; MDM keeps the golden record and the audit trail.</p>
-  </section>
-
-  <footer>Sources: Informatica documentation for SSA-NAME3 and Identity Resolution (overview, populations, key levels, search levels, match purposes, match levels, product history); Nokia and Informatica acquisition announcements, 2008. Search keys and scores in the walkthrough are illustrative.</footer>
+  <footer>Sources: Informatica documentation for SSA-NAME3 and Identity Resolution (overview, populations, multiple keys, the SSA-NAME3 key, key, search and match levels, match purposes, edit-list rules, product history); Nokia and Informatica acquisition announcements, 2008. Keys, scores and model outputs on this page are illustrative.</footer>
 </div>
 <script>
-/* ---- variation demo ---- */
 const VARS=[["Jonathan Smith","CRM"],["Jon Smyth","web form"],["SMITH, JONATHAN","SAP"],["J. Smith","invoice"],["Jonathon Smithe","call center"],["Jonathan Smith Jr.","contract"]];
-const vEl=document.getElementById("variants");
-vEl.innerHTML=VARS.map(([n,s])=>`<div class="var">${n}<small>${s}</small></div>`).join("");
+document.getElementById("variants").innerHTML=VARS.map(([n,s])=>`<div class="var">${n}<small>${s}</small></div>`).join("");
 const verdict=document.getElementById("verdict");
-document.getElementById("exactBtn").onclick=e=>{setBtn(e.target);verdict.className="verdict v-bad";verdict.textContent="Exact match: 6 different customers. Duplicates, split order history, and agents acting on the wrong record.";};
-document.getElementById("fuzzyBtn").onclick=e=>{setBtn(e.target);verdict.className="verdict v-ok";verdict.textContent="SSA-NAME3: 1 customer. Nicknames, spelling, word order and suffixes are understood, so all six resolve to one person.";};
 function setBtn(b){document.querySelectorAll("#exactBtn,#fuzzyBtn").forEach(x=>x.classList.toggle("on",x===b));}
+document.getElementById("exactBtn").onclick=e=>{setBtn(e.target);verdict.className="verdict v-bad";verdict.textContent="Exact match: 6 different customers — duplicates, split history, and agents acting on the wrong record.";};
+document.getElementById("fuzzyBtn").onclick=e=>{setBtn(e.target);verdict.className="verdict v-ok";verdict.textContent="SSA-NAME3: 1 customer. Nicknames, spellings, word order and suffixes all resolve to the same person.";};
 
-/* ---- populations ---- */
-const POPS=["USA","United Kingdom","Canada","Australia","Germany","France","Spain","Italy","Netherlands","Brazil","Mexico","India","China","Japan","Korea","Arabic mixed","Greece","Israel","South Africa","and many more"];
-document.getElementById("pops").innerHTML=POPS.map((p,i)=>`<span class="pop${[0,13,15].includes(i)?" hl":""}">${p}</span>`).join("");
+const POPS=["USA","United Kingdom","Canada","Germany","France","Spain","Brazil","Mexico","India","China","Japan","Korea","Arabic mixed","Greece","Israel","South Africa","and many more"];
+document.getElementById("pops").innerHTML=POPS.map((p,i)=>`<span class="pop${[0,10,12].includes(i)?" hl":""}">${p}</span>`).join("");
 
-/* ---- pipeline ---- */
 const CANDS=[["Jonathan Smith","12 Main Street, Springfield",94],["J. Smits","12 Main St, Springfield",78],["John Smithe","120 Maine Ave, Springfield",61]];
 const SEARCH={Narrow:[1,"fastest"],Typical:[3,"balanced"],Exhaustive:[7,"more variation"],Extreme:[15,"every possibility"]};
-let searchLvl="Typical", purpose="Person name", matchLvl=1;
-const PURP={"Person name":[["Name",90],["Address",30],["Date of birth",40],["ID numbers",60]],"Household":[["Family name",70],["Address",95],["First name",20],["ID numbers",20]],"Organization":[["Company name",95],["Address",40],["Tax ID",70],["Industry",15]]};
+let searchLvl="Typical", purpose="People", matchLvl=1;
+const PURP={"People":[["Name",90],["Address",30],["Date of birth",40],["ID numbers",60]],"Households":[["Family name",70],["Address",95],["First name",20],["ID numbers",20]],"Organizations":[["Company name",95],["Address",40],["Tax ID",70],["Industry",15]]};
 const ML=[["Conservative",90,80],["Typical",85,70],["Loose",75,60]];
 const STEPS=[
- {t:"Population",s:"Load local rules",h:()=>`<h3>1 · Pick the population</h3><p class="expl">The engine loads the rules for the data's country and language — here, the USA population, which knows that Jon is short for Jonathan and that Smyth and Smith are common variants.</p>
-   <div class="row"><span class="tag">Jon Smyth · 12 Main St · Springfield</span><span class="arrow">→</span><span class="tag k">Population: USA</span></div>
-   <div class="row" style="margin-top:14px"><span class="tag">Jon ≈ Jonathan</span><span class="tag">Smyth ≈ Smith</span><span class="tag">St = Street</span><span class="tag">Word order flexible</span></div>`},
- {t:"Keys",s:"Build fuzzy keys",h:()=>`<h3>2 · Build several fuzzy keys</h3><p class="expl">The name becomes a handful of keys designed to stay the same across typos and variants. Every record in the database is indexed on keys like these, so similar names land next to each other.</p>
+ {t:"Pick rules",s:"By country",h:()=>`<h3>1 · Pick the country's rules</h3><p class="expl">The engine loads the USA rules, which know that Jon is short for Jonathan and that Smyth is a variant of Smith.</p>
+   <div class="row"><span class="tag">Jon Smyth · 12 Main St</span><span class="arrow">→</span><span class="tag k">USA rules</span></div>
+   <div class="row" style="margin-top:12px"><span class="tag">Jon ≈ Jonathan</span><span class="tag">Smyth ≈ Smith</span><span class="tag">St = Street</span></div>`},
+ {t:"Make keys",s:"Fuzzy keys",h:()=>`<h3>2 · Turn the name into keys</h3><p class="expl">Both spellings produce the same keys — so they'll find each other. <a href="#keys" style="color:var(--blue)">See how keys are made.</a></p>
    <div class="row"><span class="tag">JON SMYTH</span><span class="arrow">→</span><span class="tag k">SMT·JN</span><span class="tag k">SMT·J</span><span class="tag k">SMT</span></div>
-   <div class="row" style="margin-top:10px"><span class="tag">JONATHAN SMITH</span><span class="arrow">→</span><span class="tag k">SMT·JN</span><span class="tag k">SMT·J</span><span class="tag k">SMT</span></div>
-   <p class="expl" style="margin-top:14px;font-size:14px;color:var(--muted)">Same keys, different spellings. Keys shown are illustrative.</p>`},
- {t:"Search",s:"Find candidates",h:()=>{const[n,d]=SEARCH[searchLvl];return `<h3>3 · Search: millions in, a handful out</h3><p class="expl">Keys define search ranges, so only nearby records come back. The search level sets how wide to look — wider finds more variation but returns more candidates to check.</p>
+   <div class="row" style="margin-top:10px"><span class="tag">JONATHAN SMITH</span><span class="arrow">→</span><span class="tag k">SMT·JN</span><span class="tag k">SMT·J</span><span class="tag k">SMT</span></div>`},
+ {t:"Search",s:"Find candidates",h:()=>{const[n,d]=SEARCH[searchLvl];return `<h3>3 · Search: millions in, a few out</h3><p class="expl">Only records with nearby keys come back. Wider searches find more variation but return more to check.</p>
    <div class="seg" role="group" aria-label="Search level">${Object.keys(SEARCH).map(k=>`<button data-s="${k}" aria-pressed="${k===searchLvl}">${k}</button>`).join("")}</div>
-   <div class="funnel"><div class="fb" style="width:100%">10,000,000 records in the database</div><div class="fb" style="width:${Math.min(40+n*3,90)}%">${(n*140).toLocaleString()} records share a key range</div><div class="fb" style="width:${Math.min(12+n*3,60)}%"><b>${n} candidate${n>1?"s":""}</b>&nbsp;to score · ${d}</div></div>`}},
- {t:"Score",s:"Compare fields",h:()=>`<h3>4 · Score each candidate</h3><p class="expl">A match purpose decides which fields matter for this kind of entity. Switch purposes to see how the weighting changes.</p>
+   <div class="funnel"><div class="fb" style="width:100%">10,000,000 records</div><div class="fb" style="width:${Math.min(40+n*3,90)}%">${(n*140).toLocaleString()} share a key</div><div class="fb" style="width:${Math.min(14+n*3,60)}%"><b>${n} candidate${n>1?"s":""}</b>&nbsp;to score · ${d}</div></div>`}},
+ {t:"Score",s:"Compare fields",h:()=>`<h3>4 · Score each candidate</h3><p class="expl">What counts depends on what you're matching. Switch to see the weights change.</p>
    <div class="seg" role="group" aria-label="Match purpose">${Object.keys(PURP).map(k=>`<button data-p="${k}" aria-pressed="${k===purpose}">${k}</button>`).join("")}</div>
-   <div style="margin-top:14px">${PURP[purpose].map(([f,w])=>`<div class="meter"><span>${f}</span><div class="bar"><i style="width:${w}%"></i></div><span class="mono">${w}</span></div>`).join("")}</div>
-   <div style="margin-top:10px">${CANDS.map(c=>`<div class="cand"><span><b>${c[0]}</b><small>${c[1]}</small></span><span class="score">${c[2]}</span></div>`).join("")}</div>`},
- {t:"Decide",s:"Match, review, or not",h:()=>{const[name,a,r]=ML[matchLvl];return `<h3>5 · Decide</h3><p class="expl">The match level sets the thresholds. Clear matches merge automatically, the gray zone goes to a data steward, and the rest stay separate. Drag the slider.</p>
-   <div class="row"><span>Match level</span><input type="range" min="0" max="2" step="1" value="${matchLvl}" id="ml" aria-label="Match level" style="width:220px"><b>${name}</b><span style="color:var(--muted);font-size:13px">match ≥ ${a} · review ≥ ${r}</span></div>
-   <div style="margin-top:10px">${CANDS.map(c=>{const d=c[2]>=a?["Match","p-ok"]:c[2]>=r?["Review","p-rv"]:["No match","p-no"];return `<div class="cand"><span><b>${c[0]}</b><small>score ${c[2]}</small></span><span class="pill ${d[1]}">${d[0]}</span></div>`}).join("")}</div>`}}
+   <div style="margin-top:12px">${PURP[purpose].map(([f,w])=>`<div class="meter"><span>${f}</span><div class="bar"><i style="width:${w}%"></i></div><span class="mono">${w}</span></div>`).join("")}</div>
+   <div style="margin-top:8px">${CANDS.map(c=>`<div class="cand"><span><b>${c[0]}</b><small>${c[1]}</small></span><span class="score">${c[2]}</span></div>`).join("")}</div>`},
+ {t:"Decide",s:"Match or not",h:()=>{const[name,a,r]=ML[matchLvl];return `<h3>5 · Decide</h3><p class="expl">Strictness sets the cut-offs. Drag the slider.</p>
+   <div class="row"><span>Strictness</span><input type="range" min="0" max="2" step="1" value="${matchLvl}" id="ml" aria-label="Match level" style="width:200px"><b>${name}</b><span class="hint">match ≥ ${a} · review ≥ ${r}</span></div>
+   <div style="margin-top:8px">${CANDS.map(c=>{const d=c[2]>=a?["Match","p-ok"]:c[2]>=r?["Review","p-rv"]:["No match","p-no"];return `<div class="cand"><span><b>${c[0]}</b><small>score ${c[2]}</small></span><span class="pill ${d[1]}">${d[0]}</span></div>`}).join("")}</div>`}}
 ];
 const stepsEl=document.getElementById("steps"), panel=document.getElementById("panel");
 STEPS.forEach((s,i)=>{const b=document.createElement("button");b.className="step";b.innerHTML=`<b>${i+1}. ${s.t}</b><span>${s.s}</span>`;b.onclick=()=>go(i);stepsEl.appendChild(b);});
 let cur=0;
 function go(i){
-  cur=(i+STEPS.length)%STEPS.length;
-  panel.innerHTML=STEPS[cur].h();
+  cur=(i+STEPS.length)%STEPS.length; panel.innerHTML=STEPS[cur].h();
   [...stepsEl.children].forEach((b,n)=>{b.removeAttribute("aria-current");if(n===cur)b.setAttribute("aria-current","step");});
   document.getElementById("pos").textContent=`Step ${cur+1} of ${STEPS.length}`;
   panel.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{searchLvl=b.dataset.s;go(cur);});
@@ -301,6 +390,31 @@ function go(i){
 document.getElementById("prev").onclick=()=>go(cur-1);
 document.getElementById("next").onclick=()=>go(cur+1);
 go(0);
+
+const KREC=[["Mr. Billy O'Neil-Smyth Jr.","web form",["ONL+SMT","SMT+WLM","ONL+WLM"]],["SMYTH, WILLIAM","SAP · reordered",["SMT+WLM"]],["William O'Neil Smith","Salesforce · other spelling",["ONL+SMT","SMT+WLM","ONL+WLM"]],["W. Smith","invoice · initial only",["SMT+W"]]];
+let ksel=0; const kEl=document.getElementById("krows");
+function renderK(){
+  const base=new Set(KREC[ksel][2]);
+  kEl.innerHTML=KREC.map((r,i)=>`<div class="krow"><div class="kname"><button class="btn${i===ksel?" on":""}" data-k="${i}">${r[0]}</button><small>${r[1]}</small></div><div class="kk">${r[2].map(k=>`<span class="tag${i!==ksel&&base.has(k)?" hit":""}">${k}</span>`).join("")}${i!==ksel?`<span class="hint">${r[2].some(k=>base.has(k))?"→ found":"→ found by a wider search"}</span>`:""}</div></div>`).join("");
+  kEl.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ksel=+b.dataset.k;renderK();});
+}
+renderK();
+
+const GZ=[["A","Jonathan Smith","12 Main Street",94,null],["B","Jon Smythe","12 Main St, Apt 2",82,["Same person — spelling variant, same building",0.91,"Match"]],["C","J. Smits","12 Main St",78,["Different person — different surname",0.86,"No match"]],["D","Joan Smith","45 Oak Rd",72,["Unsure — first name and address differ",0.58,"Review"]],["E","John Smithe","120 Maine Ave",61,null]];
+const dotsEl=document.getElementById("dots"), gEl=document.getElementById("grows"), resEl=document.getElementById("gresult"), tg=document.getElementById("dmToggle");
+dotsEl.innerHTML=GZ.map(g=>`<span class="dot" style="left:${g[3]}%">${g[0]}</span>`).join("");
+function band(s){return s>=85?["Match","p-ok"]:s>=70?["Steward review","p-rv"]:["No match","p-no"];}
+function renderG(){
+  const on=tg.checked; let review=0;
+  gEl.innerHTML=GZ.map(g=>{
+    let out=band(g[3]), note="SSA-NAME3 decides";
+    if(g[4]&&on){const[why,conf,dec]=g[4]; out=dec==="Match"?["Match","p-ok"]:dec==="No match"?["No match","p-no"]:["Steward review","p-rv"]; note=`Decision model · ${why} · confidence ${conf.toFixed(2)}`;}
+    else if(g[4]) note="Gray zone — waits for a person";
+    if(out[0]==="Steward review") review++;
+    return `<div class="grow"><span class="gid">${g[0]}</span><span class="gname"><b>${g[1]}</b><small>${g[2]} · score ${g[3]}</small></span><span class="gnote">${note}</span><span class="pill ${out[1]}">${out[0]}</span></div>`;}).join("");
+  resEl.innerHTML=on?`<b>Steward reviews: 3 → ${review}.</b> The model settles the clear gray-zone cases and hands the truly unsure one to a person.`:`<b>Steward reviews: ${review}.</b> Every gray-zone case waits for a person. Turn on the decision model to compare.`;
+}
+tg.onchange=renderG; renderG();
 </script>
 </body>
 </html>
